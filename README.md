@@ -130,21 +130,27 @@ cd pipedo
 
 Direct file access supports task management, LocalStorage, manual JSON export, and manual JSON import. Some browsers restrict automatic file access when an app is opened through a `file://` URL.
 
-### Option 2: Run a local static server
+### Option 2: Serve the files locally — still browser-only
 
-Recommended when using automatic backup files or Supabase:
+PIPEDO does not use Python as an application runtime or backend. The following command only asks Python to expose the files in the current directory over local HTTP:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Open:
+Then open PIPEDO in the browser:
 
 ```text
 http://localhost:8080
 ```
 
-Any static server works. There is no build command.
+All application code still executes in the browser. Tasks remain in browser LocalStorage, the browser talks directly to Supabase when configured, and the browser reads or writes connected backup files.
+
+Serving the files through `localhost` is useful because it provides a stable web origin and avoids restrictions that some browsers apply to `file://` pages. Chromium also treats localhost as a secure context, which enables the File System Access API used for automatic connected-file backups.
+
+Python is not required. Any static-file server, GitHub Pages, or another static host works. You may also open `index.html` directly if you only need the features supported by your browser for local files.
+
+Stopping the command only makes `http://localhost:8080` unavailable; it does not delete browser tasks or backup files. There is no build command and no PIPEDO server process.
 
 ## Local-first storage
 
@@ -391,13 +397,15 @@ Shortcuts intentionally do not run while focus is inside an input, textarea, sel
 
 ## Development
 
-There is no compilation pipeline. Edit `index.html` or `config.js`, refresh the browser, and test the affected interaction.
+There is no compilation pipeline or backend. Edit `index.html` or `config.js`, refresh the browser, and test the affected interaction.
 
-A useful local command is:
+For local development, any static server can expose the files to the browser. For example:
 
 ```bash
 python3 -m http.server 8080
 ```
+
+This Python process only serves static files; PIPEDO still runs entirely in the browser.
 
 Keep the application portable:
 
