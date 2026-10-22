@@ -1,10 +1,20 @@
 # PIPEDO
 
+<p align="center">
+  <img src="assets/pipedo-logo.svg" width="640" alt="PIPEDO — local-first task pipeline">
+</p>
+
 PIPEDO is a lightweight, local-first productivity app that combines a Todo list and a four-stage Kanban board in one portable web page.
 
 It is designed for keyboard-first task management with an Omarchy-inspired interface: sharp geometry, monospace typography, restrained color, minimal visual noise, and dark and light themes.
 
 **Live repository:** https://github.com/estebanbocic/pipedo
+
+## Preview
+
+![PIPEDO Kanban board showing tasks across Backlog, Todo, In Progress, and Done](assets/pipedo-screenshot.png)
+
+The application runs as a single browser viewport: the task area scrolls independently while navigation, synchronization state, and keyboard shortcuts remain visible.
 
 ## What PIPEDO does
 
