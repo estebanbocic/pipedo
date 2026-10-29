@@ -34,6 +34,7 @@ Each task contains:
 
 - Title
 - Description
+- A checklist of completable subitems
 - Status
 - Color
 - Optional due date
@@ -62,10 +63,11 @@ Completed tasks are never presented as overdue.
 The Todo view provides a compact list for quickly reviewing and changing tasks.
 
 - Mark tasks complete with the checkbox.
+- Complete or reopen individual subitems without completing the parent task.
 - Change status directly from the status selector.
-- Edit title, description, status, color, and due date.
+- Edit title, description, subitems, status, color, and due date.
 - Filter by status.
-- Search by title or description.
+- Search by title, description, or subitem text.
 
 ### Kanban view
 
@@ -76,9 +78,10 @@ The Kanban board contains four columns:
 3. In Progress
 4. Done
 
-Tasks can be moved by:
+Tasks can be moved and reordered by:
 
-- Dragging a card between columns.
+- Dragging a card within a column to change its order.
+- Dragging a card between columns to place it at a specific position.
 - Using the left and right movement buttons.
 - Focusing a task and pressing `Shift+1` through `Shift+4`.
 
@@ -86,7 +89,7 @@ The board is framed inside the application viewport. Task scrolling remains insi
 
 ### Search and filters
 
-The search field filters tasks immediately by title or description. Search works in both Todo and Kanban views.
+The search field filters tasks immediately by title, description, or subitem text. Search works in both Todo and Kanban views.
 
 The status filter supports:
 
@@ -125,7 +128,7 @@ Shortcuts are disabled while typing in a field or while a dialog is open.
 | `Shift+4` | Move the focused task to Done |
 | `Esc` | Close the active dialog |
 
-Click a task's non-interactive area or reach it with `Tab` to focus it. Focus follows a task when it moves, allowing several status shortcuts without selecting it again.
+Click a task's non-interactive area or reach it with `Tab` to focus it. The selected task is marked with an accent border and active-surface highlight. Focus follows a task when it moves, allowing several status shortcuts without selecting it again.
 
 ## Quick start
 
@@ -241,7 +244,7 @@ Manual operations work even when automatic file access is unavailable:
 - **EXPORT JSON** downloads a timestamped backup.
 - **IMPORT FILE** restores a backup using the selected Merge or Replace mode.
 
-The current backup format is version 2. Version 1 backups remain importable and are migrated with neutral task colors and no due dates.
+The current backup format is version 3. Version 1 and 2 backups remain importable; missing colors, due dates, and subitems are added with safe defaults.
 
 ## Optional Supabase synchronization
 
@@ -259,6 +262,7 @@ The SQL creates or updates the `tasks` table with fields for:
 
 - Task identity
 - Title and description
+- Subitems and their completion state
 - Status
 - Color
 - Due date
@@ -362,7 +366,7 @@ The app's primary interface styling and behavior are contained in `index.html`.
 ## Privacy notes
 
 - Local tasks remain in the current browser profile unless exported or synchronized.
-- JSON backups contain task titles, descriptions, dates, statuses, colors, IDs, and deletion metadata.
+- JSON backups contain task titles, descriptions, subitems, dates, statuses, colors, IDs, and deletion metadata.
 - Treat backup files as personal data.
 - `pipedo-backup*.json` and `secrets.js` are excluded by `.gitignore`.
 - Clearing browser site data removes LocalStorage unless a JSON or cloud backup exists.
