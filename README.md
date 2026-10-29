@@ -134,7 +134,7 @@ Click a task's non-interactive area or reach it with `Tab` to focus it. The sele
 
 ### Option 1: Open the file directly
 
-Clone or download the repository, then open `index.html` in a modern browser.
+Clone or download the repository, then open `index.html` for the landing page or `app.html` to open PIPEDO directly.
 
 ```bash
 git clone https://github.com/estebanbocic/pipedo.git
@@ -151,17 +151,18 @@ PIPEDO does not use Python as an application runtime or backend. The following c
 python3 -m http.server 8080
 ```
 
-Then open PIPEDO in the browser:
+Then open the landing page or application:
 
 ```text
-http://localhost:8080
+http://localhost:8080/
+http://localhost:8080/app.html
 ```
 
 All application code still executes in the browser. Tasks remain in browser LocalStorage, the browser talks directly to Supabase when configured, and the browser reads or writes connected backup files.
 
 Serving the files through `localhost` is useful because it provides a stable web origin and avoids restrictions that some browsers apply to `file://` pages. Chromium also treats localhost as a secure context, which enables the File System Access API used for automatic connected-file backups.
 
-Python is not required. Any static-file server, GitHub Pages, or another static host works. You may also open `index.html` directly if you only need the features supported by your browser for local files.
+Python is not required. Any static-file server, GitHub Pages, or another static host works. You may also open `index.html` or `app.html` directly if you only need the features supported by your browser for local files.
 
 Stopping the command only makes `http://localhost:8080` unavailable; it does not delete browser tasks or backup files. There is no build command and no PIPEDO server process.
 
@@ -349,7 +350,8 @@ If using Supabase from a deployed domain, verify that the database policies are 
 
 ```text
 pipedo/
-├── index.html   # Complete application: markup, styles, and JavaScript
+├── index.html   # Public landing page
+├── app.html     # Complete task application
 ├── config.js    # Optional Supabase connection configuration
 ├── README.md    # Project documentation
 └── .gitignore   # Excludes personal backups and local secrets
@@ -361,7 +363,7 @@ Runtime dependencies are loaded from CDNs:
 - Tailwind CSS browser script.
 - Supabase JavaScript client.
 
-The app's primary interface styling and behavior are contained in `index.html`.
+The landing page is contained in `index.html`. The task application’s interface styling and behavior are contained in `app.html`.
 
 ## Privacy notes
 
@@ -411,7 +413,7 @@ Shortcuts intentionally do not run while focus is inside an input, textarea, sel
 
 ## Development
 
-There is no compilation pipeline or backend. Edit `index.html` or `config.js`, refresh the browser, and test the affected interaction.
+There is no compilation pipeline or backend. Edit `index.html`, `app.html`, or `config.js`, refresh the browser, and test the affected interaction.
 
 For local development, any static server can expose the files to the browser. For example:
 
@@ -424,6 +426,6 @@ This Python process only serves static files; PIPEDO still runs entirely in the 
 Keep the application portable:
 
 - Avoid build-only dependencies.
-- Keep runtime behavior in `index.html`.
+- Keep landing content in `index.html` and application behavior in `app.html`.
 - Keep optional deployment configuration in `config.js`.
 - Do not commit task backup files or privileged credentials.

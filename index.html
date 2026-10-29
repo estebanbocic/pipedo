@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PIPEDO is a free, local-first Todo and Kanban task pipeline. No account or credit card required.">
   <meta name="color-scheme" content="dark light">
-  <title>PIPEDO — Local-first tasks</title>
+  <title>PIPEDO — Move work forward</title>
   <script>
     (() => {
       try {
@@ -18,2551 +19,523 @@
       }
     })();
   </script>
-  <script src="./config.js" onerror="this.remove()"></script>
-  <script defer src="https://cdn.tailwindcss.com"></script>
-  <script>
-    window.__pipedoSupabaseReady = new Promise((resolve) => {
-      let settled = false;
-      const finish = (value) => {
-        if (settled) return;
-        settled = true;
-        resolve(value);
-      };
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js';
-      script.async = true;
-      script.onload = () => finish(window.supabase || null);
-      script.onerror = () => finish(null);
-      document.head.appendChild(script);
-      window.setTimeout(() => finish(window.supabase || null), 3500);
-    });
-  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-
     :root {
-      color-scheme: dark;
-      --bg: #101014;
-      --panel: #16161e;
-      --panel-2: #1a1b26;
-      --chrome: #111116;
-      --surface-hover: #202131;
-      --surface-active: #24283b;
-      --row-hover: #191a23;
-      --drop-target: #1c2030;
-      --column-header: #181922;
-      --card-hover: #151620;
-      --line: #30313d;
+      --bg: #0a0a0f;
+      --panel: #101014;
+      --chrome: #13131a;
+      --surface: #17171f;
+      --surface-hover: #1d1d27;
+      --line: #2a2a36;
       --line-strong: #414354;
-      --card-divider: #272834;
       --text: #c0caf5;
-      --title: #d7ddff;
+      --title: #e3e7ff;
       --muted: #7f849c;
-      --placeholder: #666b80;
-      --drag-handle: #5f6478;
       --accent: #bb9af7;
-      --accent-hover: #c9afff;
-      --accent-glow: rgba(187, 154, 247, .22);
-      --on-accent: #101014;
-      --blue: #7aa2f7;
+      --accent-soft: rgba(187, 154, 247, .12);
+      --accent-glow: rgba(187, 154, 247, .26);
       --cyan: #7dcfff;
       --green: #9ece6a;
       --yellow: #e0af68;
-      --red: #f7768e;
-      --purple: #bb9af7;
-      --focus: #bb9af7;
-      --danger-line: #6f3543;
-      --danger-bg: #321c24;
-      --warning-line: #6c5534;
-      --warning-bg: #2b2419;
-      --code-bg: #0d0d11;
-      --code-text: #b4c2f0;
-      --dialog-shadow: rgba(0, 0, 0, .5);
-      --backdrop: rgba(5, 5, 8, .78);
+      --pink: #f7768e;
+      --on-accent: #101014;
+      --grid: rgba(187, 154, 247, .055);
+      --shadow: rgba(0, 0, 0, .48);
     }
 
     html[data-theme="light"] {
-      color-scheme: light;
-      --bg: #f5f3f8;
+      --bg: #f7f4fa;
       --panel: #ffffff;
-      --panel-2: #f0edf5;
-      --chrome: #faf9fc;
-      --surface-hover: #eee9f5;
-      --surface-active: #e8e0f2;
-      --row-hover: #f4f0f8;
-      --drop-target: #eee8f6;
-      --column-header: #f8f6fa;
-      --card-hover: #f7f4fa;
+      --chrome: #f2eef5;
+      --surface: #ece7f1;
+      --surface-hover: #e5ddec;
       --line: #ddd7e4;
       --line-strong: #bdb4c8;
-      --card-divider: #e4dfe9;
       --text: #332e3b;
       --title: #211c29;
       --muted: #706778;
-      --placeholder: #82778c;
-      --drag-handle: #766c80;
       --accent: #7430d8;
-      --accent-hover: #6528c2;
-      --accent-glow: rgba(116, 48, 216, .16);
+      --accent-soft: rgba(116, 48, 216, .09);
+      --accent-glow: rgba(116, 48, 216, .17);
+      --cyan: #176f8d;
+      --green: #38761d;
+      --yellow: #96610a;
+      --pink: #b4234d;
       --on-accent: #ffffff;
-      --blue: #3566b8;
-      --cyan: #0c718c;
-      --green: #347a1d;
-      --yellow: #855900;
-      --red: #b4233d;
-      --purple: #7430d8;
-      --focus: #7430d8;
-      --danger-line: #c96c7d;
-      --danger-bg: #fbeef1;
-      --warning-line: #b99251;
-      --warning-bg: #fff7e6;
-      --code-bg: #f2eef6;
-      --code-text: #47365f;
-      --dialog-shadow: rgba(42, 31, 51, .18);
-      --backdrop: rgba(32, 25, 38, .42);
+      --grid: rgba(116, 48, 216, .065);
+      --shadow: rgba(42, 31, 51, .18);
     }
 
-    * { box-sizing: border-box; border-radius: 0 !important; }
-    html { height: 100%; min-height: 100%; overflow: hidden; background: var(--bg); }
+    * { box-sizing: border-box; border-radius: 0; }
+    html { scroll-behavior: smooth; background: var(--bg); }
     body {
-      height: 100%;
-      min-height: 100%;
+      min-width: 320px;
       margin: 0;
-      overflow: hidden;
-      background: var(--bg);
+      overflow-x: hidden;
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        var(--bg);
+      background-size: 48px 48px;
       color: var(--text);
-      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.6;
     }
-    button, input, textarea, select { font: inherit; }
-    button, select { cursor: pointer; }
-    button:disabled { cursor: not-allowed; opacity: .45; }
-    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    body::before {
+      position: fixed;
+      z-index: -1;
+      top: -28rem;
+      left: 50%;
+      width: 58rem;
+      height: 58rem;
+      background: radial-gradient(circle, var(--accent-glow), transparent 66%);
+      content: "";
+      pointer-events: none;
+      transform: translateX(-50%);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .skip-link { position: fixed; z-index: 100; top: 8px; left: 8px; padding: 8px 11px; border: 1px solid var(--accent); background: var(--panel); color: var(--title); transform: translateY(-150%); }
+    .skip-link:focus { transform: translateY(0); }
     ::selection { color: var(--on-accent); background: var(--accent); }
-    ::placeholder { color: var(--placeholder); }
 
-    .app-shell { height: 100vh; height: 100dvh; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar {
-      min-height: 58px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      padding: 10px 22px;
+    .shell { width: min(1180px, calc(100% - 44px)); margin: 0 auto; }
+    .site-header {
+      position: sticky;
+      z-index: 20;
+      top: 0;
       border-bottom: 1px solid var(--line);
-      background: var(--chrome);
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(14px);
     }
-    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .nav { display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; color: var(--title); font-weight: 800; letter-spacing: .14em; }
     .brand-mark {
       position: relative;
       display: grid;
-      width: 30px;
-      height: 30px;
-      overflow: hidden;
+      width: 34px;
+      height: 34px;
       place-items: center;
+      overflow: hidden;
       border: 1px solid var(--accent);
       color: var(--accent);
-      font-size: 16px;
-      font-weight: 700;
-      animation: logo-breathe 5.5s ease-in-out infinite;
+      font-size: 17px;
     }
     .brand-mark::after {
       position: absolute;
-      bottom: 3px;
-      left: -11px;
-      width: 9px;
+      bottom: 4px;
+      left: -12px;
+      width: 11px;
       height: 1px;
       background: var(--accent);
-      box-shadow: 0 0 5px var(--accent);
+      box-shadow: 0 0 8px var(--accent);
       content: "";
-      opacity: 0;
-      animation: logo-scan 5.5s ease-in-out infinite;
+      animation: mark-scan 4.8s ease-in-out infinite;
     }
-    @keyframes logo-breathe {
-      0%, 18%, 100% { box-shadow: 0 0 0 transparent; }
-      45%, 62% { box-shadow: 0 0 13px var(--accent-glow); }
-    }
-    @keyframes logo-scan {
-      0%, 24% { opacity: 0; transform: translateX(0); }
-      34% { opacity: .3; }
-      60% { opacity: .7; transform: translateX(33px); }
-      68%, 100% { opacity: 0; transform: translateX(33px); }
-    }
-    .brand h1 { margin: 0; color: var(--title); font-size: 16px; letter-spacing: .12em; }
-    .brand p { margin: 1px 0 0; color: var(--muted); font-size: 10px; letter-spacing: .05em; }
-    .header-actions { display: flex; align-items: center; gap: 8px; }
-    .sync-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      min-height: 30px;
-      padding: 5px 9px;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 10px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .sync-dot { width: 7px; height: 7px; background: var(--muted); }
-    .sync-status[data-mode="cloud"] .sync-dot { background: var(--green); }
-    .sync-status[data-mode="syncing"] .sync-dot { background: var(--yellow); animation: pulse 1s steps(2, end) infinite; }
-    .sync-status[data-mode="error"] .sync-dot { background: var(--red); }
-    @keyframes pulse { 50% { opacity: .25; } }
-    .backup-button { display: inline-flex; align-items: center; gap: 7px; }
-    .backup-led { width: 7px; height: 7px; flex: 0 0 auto; background: var(--muted); }
-    .backup-led[data-state="pending"] { background: var(--yellow); animation: pulse 1s steps(2, end) infinite; }
-    .backup-led[data-state="current"] { background: var(--green); }
-    .backup-led[data-state="error"] { background: var(--red); }
-
-    .theme-button { display: inline-flex; min-width: 72px; align-items: center; justify-content: center; gap: 6px; }
-    .theme-glyph { color: var(--accent); font-size: 13px; line-height: 1; }
-
-    .btn {
-      min-height: 34px;
-      padding: 6px 11px;
-      border: 1px solid var(--line-strong);
-      background: transparent;
-      color: var(--text);
-      transition: border-color .12s, color .12s, background .12s;
-    }
-    .btn:hover { border-color: var(--accent); color: var(--title); background: var(--surface-hover); }
-    .btn-primary { border-color: var(--accent); background: var(--accent); color: var(--on-accent); font-weight: 700; }
-    .btn-primary:hover { border-color: var(--accent-hover); background: var(--accent-hover); color: var(--on-accent); }
-    .btn-danger { border-color: var(--danger-line); color: var(--red); }
-    .btn-danger:hover { border-color: var(--red); background: var(--danger-bg); }
-    .icon-btn { min-width: 34px; padding: 5px 8px; }
-    .kbd {
-      display: inline-block;
-      min-width: 20px;
-      padding: 1px 4px;
-      border: 1px solid var(--line-strong);
-      background: var(--chrome);
-      color: var(--muted);
-      font-size: 10px;
-      text-align: center;
-    }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: auto minmax(220px, 1fr) auto auto;
-      gap: 10px;
-      align-items: center;
-      padding: 14px 22px;
-      border-bottom: 1px solid var(--line);
-      background: var(--panel);
-    }
-    .view-switcher { display: inline-flex; border: 1px solid var(--line-strong); }
-    .view-button {
-      min-height: 36px;
-      padding: 6px 12px;
-      border: 0;
-      border-right: 1px solid var(--line-strong);
-      background: transparent;
-      color: var(--muted);
-    }
-    .view-button:last-child { border-right: 0; }
-    .view-button[aria-selected="true"] { background: var(--surface-active); color: var(--accent); }
-    .search-wrap { position: relative; min-width: 0; }
-    .search-icon { position: absolute; top: 8px; left: 11px; color: var(--muted); pointer-events: none; }
-    .field {
-      width: 100%;
+    .nav-actions { display: flex; align-items: center; gap: 9px; }
+    .theme-toggle, .button {
       min-height: 38px;
-      padding: 7px 10px;
       border: 1px solid var(--line-strong);
       background: var(--chrome);
       color: var(--text);
+      cursor: pointer;
+      transition: border-color .16s, background .16s, color .16s, transform .16s;
     }
-    .field:focus { border-color: var(--focus); outline: 1px solid var(--focus); }
-    .search-input { padding-left: 34px; padding-right: 38px; color: var(--title); caret-color: var(--accent); -webkit-text-fill-color: var(--title); }
-    .search-input::placeholder { color: var(--placeholder); opacity: 1; -webkit-text-fill-color: var(--placeholder); }
-    .search-key { position: absolute; top: 8px; right: 9px; left: auto; transition: opacity .12s; }
-    .search-wrap:focus-within .search-key, .search-input:not(:placeholder-shown) + .search-key { opacity: 0; }
-    .filter-select { min-width: 145px; }
+    .theme-toggle { width: 40px; padding: 0; color: var(--accent); }
+    .theme-toggle:hover, .button-secondary:hover { border-color: var(--accent); background: var(--surface-hover); }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 15px; font-weight: 700; letter-spacing: .04em; }
+    .button-primary { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+    .button-primary:hover { box-shadow: 6px 6px 0 var(--accent-glow); transform: translate(-2px, -2px); }
+    .button-arrow { transition: transform .16s; }
+    .button:hover .button-arrow { transform: translateX(3px); }
 
-    main { flex: 1 1 auto; min-height: 0; overflow: hidden; }
-    .view { height: 100%; min-height: 0; padding: 18px 22px 26px; }
-    #todo-view { overflow: auto; overscroll-behavior: contain; }
-    #board-view { display: flex; flex-direction: column; overflow: hidden; }
-    .view-heading { flex: 0 0 auto; display: flex; align-items: end; justify-content: space-between; gap: 14px; margin-bottom: 13px; }
-    .view-heading h2 { margin: 0; color: var(--title); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; }
-    .view-heading p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
-    .count { color: var(--accent); }
-
-    .todo-list { border: 1px solid var(--line); background: var(--panel); }
-    .todo-row {
-      --task-color: var(--line-strong);
+    .hero {
       display: grid;
-      grid-template-columns: auto minmax(0, 1fr) auto auto;
-      gap: 12px;
+      min-height: calc(100vh - 68px);
+      grid-template-columns: minmax(0, .92fr) minmax(440px, 1.08fr);
       align-items: center;
-      min-height: 64px;
-      padding: 11px 13px 11px 10px;
-      border-bottom: 1px solid var(--line);
-      border-inline-start: 3px solid var(--task-color);
-      transition: background .12s, box-shadow .12s;
+      gap: clamp(42px, 7vw, 96px);
+      padding: 92px 0 78px;
     }
-    .todo-row:last-child { border-bottom: 0; }
-    .todo-row:hover { background: var(--row-hover); }
-    .todo-row:focus, .todo-row:focus-within {
-      background: var(--surface-active);
-      box-shadow: inset 0 0 0 1px var(--accent), inset -3px 0 0 var(--accent);
-      outline: none;
-    }
-    .todo-row.is-done .task-title { color: var(--muted); text-decoration: line-through; }
-    .check-button {
-      display: grid;
-      width: 23px;
-      height: 23px;
-      place-items: center;
-      border: 1px solid var(--line-strong);
-      background: var(--chrome);
-      color: var(--chrome);
-    }
-    .check-button[aria-checked="true"] { border-color: var(--green); background: var(--green); }
-    .task-copy { min-width: 0; }
-    .task-title { overflow: hidden; color: var(--title); font-size: 15px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-    .task-description { overflow: hidden; margin-top: 2px; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-    .status-select { width: 142px; min-height: 32px; padding: 4px 7px; border: 1px solid var(--line); background: var(--chrome); color: var(--text); font-size: 12px; }
-    .row-actions { display: flex; gap: 5px; }
-    .due-badge {
-      display: inline-flex;
-      width: fit-content;
-      margin-top: 5px;
-      padding: 1px 5px;
-      border: 1px solid var(--line-strong);
-      color: var(--cyan);
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      line-height: 1.5;
-    }
-    .due-badge.is-overdue { border-color: var(--danger-line); color: var(--red); }
-    .due-badge.is-today { border-color: var(--warning-line); color: var(--yellow); }
-    .due-badge.is-complete { color: var(--muted); }
+    .eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 24px; color: var(--accent); font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
+    .eyebrow::before { width: 30px; height: 1px; background: var(--accent); content: ""; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 760px; margin-bottom: 25px; color: var(--title); font-size: clamp(48px, 5.8vw, 78px); line-height: .98; letter-spacing: -.065em; }
+    .hero-highlight { position: relative; color: var(--accent); }
+    .hero-highlight::after { position: absolute; right: 2px; bottom: -.1em; left: 4px; height: 2px; background: var(--accent); content: ""; transform-origin: left; animation: line-grow 1s .35s both; }
+    .hero-copy { max-width: 610px; margin-bottom: 32px; color: var(--muted); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: clamp(17px, 2vw, 20px); line-height: 1.7; }
+    .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 13px; }
+    .hero-actions .button { min-height: 48px; padding-inline: 20px; }
+    .free-note { display: flex; width: 100%; align-items: center; gap: 9px; margin: 4px 0 0; color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+    .free-note::before { width: 7px; height: 7px; background: var(--green); box-shadow: 0 0 9px color-mix(in srgb, var(--green) 55%, transparent); content: ""; }
 
-    .board {
-      display: grid;
-      flex: 1 1 auto;
-      min-height: 0;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 1px;
-      overflow: auto;
-      overscroll-behavior: contain;
-      scrollbar-color: var(--line-strong) var(--panel);
-      scrollbar-width: thin;
-      border: 1px solid var(--line);
-      background: var(--line);
-    }
-    .board-column { min-width: 0; min-height: 100%; height: max-content; background: var(--panel); }
-    .board-column.is-drop-target { background: var(--drop-target); box-shadow: inset 0 0 0 1px var(--accent); }
-    .column-header {
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      min-height: 45px;
-      padding: 9px 11px;
-      border-bottom: 1px solid var(--line);
-      background: var(--column-header);
-    }
-    .column-title { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
-    .column-accent { width: 3px; height: 14px; background: var(--muted); }
-    [data-status="backlog"] .column-accent { background: var(--muted); }
-    [data-status="todo"] .column-accent { background: var(--accent); }
-    [data-status="in_progress"] .column-accent { background: var(--yellow); }
-    [data-status="done"] .column-accent { background: var(--green); }
-    .column-count { color: var(--muted); font-size: 11px; }
-    .column-cards { display: flex; min-height: calc(100% - 45px); flex-direction: column; gap: 8px; padding: 9px; }
-    .task-card {
-      --task-color: var(--line-strong);
-      position: relative;
-      padding: 10px 10px 10px 8px;
-      border: 1px solid var(--line-strong);
-      border-inline-start: 3px solid var(--task-color);
-      background: var(--chrome);
-      transition: border-color .12s, background .12s, box-shadow .12s;
-    }
-    .task-card:hover { border-color: var(--line-strong); border-inline-start-color: var(--task-color); background: var(--card-hover); }
-    .task-card:focus, .task-card:focus-within {
-      border-color: var(--accent);
-      border-inline-start-color: var(--task-color);
-      background: var(--surface-active);
-      box-shadow: 4px 4px 0 var(--accent-glow);
-      outline: none;
-    }
-    .card-top { display: flex; align-items: start; gap: 8px; }
-    .drag-handle {
-      flex: 0 0 auto;
-      padding: 0 3px;
-      border: 0;
-      background: transparent;
-      color: var(--drag-handle);
-      font-size: 15px;
-      line-height: 20px;
-      touch-action: none;
-      cursor: grab;
-    }
-    .drag-handle:active { cursor: grabbing; }
-    .card-title { flex: 1; margin: 0; overflow-wrap: anywhere; color: var(--title); font-size: 14px; line-height: 1.45; }
-    .card-description { margin: 8px 0 0; overflow-wrap: anywhere; color: var(--muted); font-size: 12px; white-space: pre-wrap; }
-    .subitem-list { display: grid; gap: 5px; margin: 8px 0 0; padding: 0; list-style: none; }
-    .subitem { display: flex; min-width: 0; align-items: start; gap: 7px; color: var(--text); font-size: 11px; }
-    .subitem-toggle { display: grid; width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; padding: 0; place-items: center; border: 1px solid var(--line-strong); background: transparent; color: transparent; font-size: 10px; line-height: 1; }
-    .subitem-toggle[aria-checked="true"] { border-color: var(--green); background: var(--green); color: var(--chrome); }
-    .subitem.is-complete .subitem-title { color: var(--muted); text-decoration: line-through; }
-    .subitem-title { min-width: 0; overflow-wrap: anywhere; }
-    .todo-subitems { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-    .task-card.is-drop-before::before { position: absolute; top: -6px; right: 0; left: 0; height: 2px; background: var(--accent); content: ""; }
-    .column-cards.is-drop-at-end::after { display: block; height: 2px; flex: 0 0 auto; background: var(--accent); content: ""; }
-    .card-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 11px; padding-top: 8px; border-top: 1px solid var(--card-divider); }
-    .card-date { color: var(--muted); font-size: 10px; }
-    .move-controls { display: flex; gap: 4px; }
-    .move-button { min-width: 27px; min-height: 25px; padding: 1px 5px; border: 1px solid var(--line); background: transparent; color: var(--muted); }
-    .move-button:hover { border-color: var(--accent); color: var(--accent); }
-    .drag-ghost { position: fixed; z-index: 9999; width: 245px; pointer-events: none; opacity: .9; transform: rotate(1deg); border-color: var(--accent); box-shadow: 8px 8px 0 var(--dialog-shadow); }
-    body.is-dragging { user-select: none; }
+    .hero-visual { position: relative; min-width: 0; }
+    .visual-frame { position: relative; border: 1px solid var(--line-strong); background: color-mix(in srgb, var(--panel) 94%, transparent); box-shadow: 18px 18px 0 var(--shadow); }
+    .visual-frame::before, .visual-frame::after { position: absolute; z-index: 2; width: 12px; height: 12px; content: ""; pointer-events: none; }
+    .visual-frame::before { top: -1px; left: -1px; border-top: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+    .visual-frame::after { right: -1px; bottom: -1px; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); }
+    .visual-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 13px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 9px; letter-spacing: .09em; text-transform: uppercase; }
+    .visual-status { display: inline-flex; align-items: center; gap: 7px; color: var(--green); }
+    .status-dot { width: 6px; height: 6px; background: currentColor; animation: pulse 2.2s steps(2, end) infinite; }
+    .pipeline-svg { display: block; width: 100%; height: auto; }
+    .pipeline-svg text { font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace; }
+    .signal-line { stroke-dasharray: 5 8; animation: signal-flow 8s linear infinite; }
+    .signal-node { transform-box: fill-box; transform-origin: center; animation: node-pulse 3.4s ease-in-out infinite; }
+    .signal-node:nth-of-type(2) { animation-delay: .8s; }
+    .signal-node:nth-of-type(3) { animation-delay: 1.6s; }
+    .moving-card { transform-box: fill-box; transform-origin: center; animation: card-float 4s ease-in-out infinite; }
+    .moving-card:nth-of-type(2) { animation-delay: -1.7s; }
+    .scan-line { animation: board-scan 6s ease-in-out infinite; }
+    .visual-caption { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+    .visual-caption strong { color: var(--accent); font-weight: 600; }
+    .float-tag { position: absolute; z-index: 3; padding: 7px 9px; border: 1px solid var(--line-strong); background: var(--chrome); color: var(--muted); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; box-shadow: 7px 7px 0 var(--shadow); }
+    .float-tag.one { top: 19%; right: -31px; animation: tag-float 5s ease-in-out infinite; }
+    .float-tag.two { bottom: 14%; left: -35px; animation: tag-float 5s -2.5s ease-in-out infinite; }
+    .float-tag strong { color: var(--title); }
 
-    .empty-state { display: grid; min-height: 210px; place-items: center; padding: 26px; text-align: center; }
-    .empty-state strong { display: block; margin-bottom: 5px; color: var(--text); font-size: 12px; }
-    .empty-state span { color: var(--muted); font-size: 10px; }
-    .column-empty { min-height: 110px; padding: 28px 10px; color: var(--muted); font-size: 10px; text-align: center; }
+    .proof-bar { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 86%, transparent); }
+    .proof-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .proof-item { display: grid; grid-template-columns: auto 1fr; gap: 14px; padding: 24px 28px; border-right: 1px solid var(--line); }
+    .proof-item:last-child { border-right: 0; }
+    .proof-index { color: var(--accent); font-size: 10px; }
+    .proof-item strong { display: block; margin-bottom: 3px; color: var(--title); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+    .proof-item span { color: var(--muted); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 13px; }
 
-    .footer {
-      flex: 0 0 auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      padding: 11px 22px;
-      border-top: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 10px;
-    }
-    .shortcuts { display: flex; flex-wrap: wrap; gap: 12px; }
-    .shortcut { white-space: nowrap; }
+    .section { padding: 120px 0; }
+    .section-heading { display: grid; grid-template-columns: .8fr 1.2fr; gap: 60px; align-items: end; margin-bottom: 54px; }
+    .section-kicker { margin-bottom: 13px; color: var(--accent); font-size: 10px; letter-spacing: .13em; text-transform: uppercase; }
+    h2 { margin-bottom: 0; color: var(--title); font-size: clamp(34px, 4.8vw, 58px); line-height: 1.08; letter-spacing: -.045em; }
+    .section-intro { max-width: 580px; margin: 0 0 4px auto; color: var(--muted); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 17px; line-height: 1.75; }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); background: var(--line); gap: 1px; }
+    .feature { position: relative; min-height: 330px; padding: 30px; overflow: hidden; background: var(--panel); transition: background .18s; }
+    .feature:hover { background: var(--surface); }
+    .feature-number { color: var(--muted); font-size: 9px; letter-spacing: .1em; }
+    .feature-graphic { display: grid; height: 112px; margin: 26px 0 30px; place-items: center; color: var(--accent); }
+    .feature-graphic svg { width: 100%; height: 100%; overflow: visible; }
+    .feature h3 { margin-bottom: 10px; color: var(--title); font-size: 17px; letter-spacing: -.02em; }
+    .feature p { margin-bottom: 0; color: var(--muted); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 1.7; }
+    .feature-accent { position: absolute; top: 0; left: 0; width: 48px; height: 2px; background: var(--accent); transition: width .25s; }
+    .feature:hover .feature-accent { width: 100%; }
+    .orbit { transform-box: fill-box; transform-origin: center; animation: orbit-spin 10s linear infinite; }
+    .check-path { stroke-dasharray: 42; stroke-dashoffset: 42; animation: check-draw 3.6s ease-in-out infinite; }
+    .backup-arrow { animation: backup-shift 3s ease-in-out infinite; }
 
-    dialog {
-      width: min(580px, calc(100vw - 28px));
-      max-height: calc(100vh - 28px);
-      padding: 0;
-      overflow: auto;
-      border: 1px solid var(--line-strong);
-      background: var(--panel);
-      color: var(--text);
-      box-shadow: 14px 14px 0 var(--dialog-shadow);
-    }
-    dialog::backdrop { background: var(--backdrop); }
-    .modal-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 15px; border-bottom: 1px solid var(--line); background: var(--chrome); }
-    .modal-header h2 { margin: 0; color: var(--title); font-size: 13px; letter-spacing: .07em; text-transform: uppercase; }
-    .modal-close { min-height: 29px; }
-    .modal-body { padding: 16px; }
-    .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; margin-bottom: 5px; color: var(--muted); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
-    textarea.field { min-height: 115px; resize: vertical; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    input[type="date"] { color-scheme: inherit; }
-    .subitem-editor { display: grid; gap: 7px; }
-    .subitem-editor-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 7px; align-items: center; }
-    .subitem-editor-row .subitem-toggle { width: 22px; height: 22px; margin: 0; }
-    .subitem-editor-row .field { min-height: 34px; }
-    .subitem-remove { min-height: 34px; }
-    .subitem-add { margin-top: 8px; }
-    .modal-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 13px 16px; border-top: 1px solid var(--line); }
-    .modal-actions .delete-slot { margin-right: auto; }
-    .setup-copy { margin: 0 0 13px; color: var(--muted); font-size: 11px; }
-    .warning { margin: 0 0 14px; padding: 10px; border: 1px solid var(--warning-line); background: var(--warning-bg); color: var(--yellow); font-size: 10px; }
-    pre { max-height: 360px; margin: 0; padding: 12px; overflow: auto; border: 1px solid var(--line); background: var(--code-bg); color: var(--code-text); font: 10px/1.55 "JetBrains Mono", monospace; white-space: pre; }
-    .backup-copy { margin: 0 0 12px; color: var(--muted); font-size: 11px; }
-    .backup-state { margin-bottom: 14px; padding: 11px; border: 1px solid var(--line-strong); background: var(--chrome); }
-    .backup-state-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-    .backup-state-label, .backup-group-title { color: var(--muted); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
-    .backup-mode { color: var(--accent); font-size: 11px; letter-spacing: .06em; text-align: right; }
-    .backup-state[data-level="error"] .backup-mode { color: var(--red); }
-    .backup-state[data-level="warning"] .backup-mode { color: var(--yellow); }
-    .backup-status-copy { margin: 7px 0 0; color: var(--muted); font-size: 10px; overflow-wrap: anywhere; }
-    .backup-group { margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--line); }
-    .backup-group-title { margin: 0 0 8px; }
-    .backup-choice { display: block; margin: 14px 0; }
-    .backup-choice > span { display: block; margin-bottom: 5px; color: var(--muted); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
-    .backup-choice .field { min-height: 34px; font-size: 11px; }
-    .backup-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .backup-actions.is-three { grid-template-columns: repeat(3, 1fr); }
-    .backup-actions .btn { width: 100%; }
-    .visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-    [hidden] { display: none !important; }
+    .flow-section { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--panel); }
+    .flow-layout { display: grid; grid-template-columns: .72fr 1.28fr; gap: 74px; align-items: center; }
+    .flow-copy p { max-width: 460px; margin: 23px 0 29px; color: var(--muted); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 16px; }
+    .flow-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+    .flow-list li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); color: var(--text); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+    .flow-list span { color: var(--green); }
+    .board-demo { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; min-height: 420px; border: 1px solid var(--line-strong); background: var(--line); box-shadow: 14px 14px 0 var(--shadow); }
+    .demo-column { min-width: 0; background: var(--bg); }
+    .demo-column-head { display: flex; align-items: center; gap: 7px; padding: 12px 9px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 8px; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+    .demo-column-head::before { width: 3px; height: 12px; background: var(--accent); content: ""; }
+    .demo-column:nth-child(1) .demo-column-head::before { background: var(--muted); }
+    .demo-column:nth-child(3) .demo-column-head::before { background: var(--yellow); }
+    .demo-column:nth-child(4) .demo-column-head::before { background: var(--green); }
+    .demo-card { margin: 9px; padding: 10px; border: 1px solid var(--line-strong); border-left: 3px solid var(--accent); background: var(--chrome); color: var(--title); font-size: 9px; box-shadow: 0 0 0 transparent; animation: demo-breathe 5s ease-in-out infinite; }
+    .demo-card small { display: block; margin-top: 8px; color: var(--muted); font-size: 7px; }
+    .demo-card.green { border-left-color: var(--green); animation-delay: -1.2s; }
+    .demo-card.cyan { border-left-color: var(--cyan); animation-delay: -2.4s; }
+    .demo-card.pink { border-left-color: var(--pink); animation-delay: -3.6s; }
+    .demo-check { display: flex; align-items: center; gap: 5px; margin-top: 7px; color: var(--muted); font-size: 7px; }
+    .demo-check::before { width: 8px; height: 8px; border: 1px solid var(--green); background: var(--green); content: "✓"; color: var(--bg); font-size: 6px; line-height: 8px; text-align: center; }
 
-    .topbar, .toolbar { flex: 0 0 auto; }
+    .final-cta { padding: 130px 0; text-align: center; }
+    .cta-frame { position: relative; padding: 74px 30px; border: 1px solid var(--line-strong); background: color-mix(in srgb, var(--panel) 92%, transparent); box-shadow: 16px 16px 0 var(--shadow); }
+    .cta-frame::before { position: absolute; top: 0; left: 50%; width: 120px; height: 2px; background: var(--accent); content: ""; transform: translateX(-50%); }
+    .cta-frame h2 { max-width: 730px; margin: 0 auto 18px; }
+    .cta-frame p { max-width: 560px; margin: 0 auto 28px; color: var(--muted); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 17px; }
+    .cta-frame .button { min-height: 50px; padding-inline: 22px; }
+
+    .site-footer { border-top: 1px solid var(--line); background: var(--panel); }
+    .footer-inner { display: flex; min-height: 84px; align-items: center; justify-content: space-between; gap: 24px; color: var(--muted); font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
+    .footer-signal { display: inline-flex; align-items: center; gap: 8px; }
+    .footer-signal::before { width: 6px; height: 6px; background: var(--green); content: ""; }
+
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .65s ease, transform .65s ease; }
+    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes mark-scan { 0%, 20% { opacity: 0; transform: translateX(0); } 35% { opacity: 1; } 65% { opacity: 1; transform: translateX(34px); } 75%, 100% { opacity: 0; transform: translateX(34px); } }
+    @keyframes line-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    @keyframes pulse { 50% { opacity: .3; } }
+    @keyframes signal-flow { to { stroke-dashoffset: -104; } }
+    @keyframes node-pulse { 0%, 100% { opacity: .55; transform: scale(.88); } 50% { opacity: 1; transform: scale(1.12); } }
+    @keyframes card-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @keyframes board-scan { 0%, 12% { opacity: 0; transform: translateY(-70px); } 25% { opacity: .75; } 70% { opacity: .35; transform: translateY(168px); } 80%, 100% { opacity: 0; transform: translateY(168px); } }
+    @keyframes tag-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes orbit-spin { to { transform: rotate(360deg); } }
+    @keyframes check-draw { 0%, 18% { stroke-dashoffset: 42; } 45%, 82% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -42; } }
+    @keyframes backup-shift { 0%, 100% { transform: translateY(0); opacity: .55; } 50% { transform: translateY(-7px); opacity: 1; } }
+    @keyframes demo-breathe { 0%, 100% { box-shadow: 0 0 0 transparent; } 50% { box-shadow: 4px 4px 0 var(--accent-soft); } }
+
     @media (max-width: 980px) {
-      .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .toolbar { grid-template-columns: auto minmax(180px, 1fr) auto; }
-      .toolbar .btn-primary { grid-column: 1 / -1; }
-      .board-column { min-height: 100%; }
-      .column-cards { min-height: calc(100% - 45px); }
+      .hero { min-height: auto; grid-template-columns: 1fr; padding-top: 78px; }
+      .hero-copy { max-width: 690px; }
+      .hero-visual { width: min(720px, 100%); margin: 0 auto; }
+      .proof-item { padding-inline: 18px; }
+      .section-heading, .flow-layout { grid-template-columns: 1fr; gap: 30px; }
+      .section-intro { margin-left: 0; }
+      .flow-layout { gap: 52px; }
     }
-    @media (max-width: 640px) {
-      .topbar { align-items: flex-start; padding: 10px 12px; }
-      .brand p { display: none; }
-      .header-actions { flex-wrap: wrap; justify-content: flex-end; }
-      .sync-status { order: 3; }
-      .toolbar { grid-template-columns: 1fr 1fr; padding: 10px 12px; }
-      .view-switcher { width: 100%; }
-      .view-button { flex: 1; }
-      .search-wrap { grid-column: 1 / -1; grid-row: 2; }
-      .filter-select { width: 100%; min-width: 0; }
-      .toolbar .btn-primary { grid-column: auto; }
-      .view { padding: 12px; }
-      .board { grid-template-columns: 1fr; }
-      .board-column { min-height: 0; }
-      .column-cards { min-height: 125px; }
-      .column-header { position: static; }
-      .todo-row { grid-template-columns: auto minmax(0, 1fr) auto; gap: 9px; }
-      .todo-row .status-select { grid-column: 2 / -1; width: 100%; }
-      .row-actions { grid-column: 3; grid-row: 1; }
-      .footer { flex-direction: column; padding: 10px 12px; }
-      .footer > span { display: none; }
-      .backup-actions.is-three { grid-template-columns: 1fr; }
-      .modal-actions { flex-wrap: wrap; }
-      .backup-actions { grid-template-columns: 1fr; }
-      .form-row { grid-template-columns: 1fr; gap: 0; }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      .nav { min-height: 60px; }
+      .brand { font-size: 12px; }
+      .brand-mark { width: 30px; height: 30px; }
+      .nav-actions .button { padding-inline: 10px; font-size: 11px; }
+      .hero { padding: 66px 0 60px; }
+      h1 { font-size: clamp(43px, 15vw, 68px); }
+      .hero-highlight { white-space: normal; }
+      .float-tag { display: none; }
+      .visual-frame { box-shadow: 9px 9px 0 var(--shadow); }
+      .proof-grid { grid-template-columns: 1fr; }
+      .proof-item { border-right: 0; border-bottom: 1px solid var(--line); }
+      .proof-item:last-child { border-bottom: 0; }
+      .section { padding: 84px 0; }
+      .section-heading { margin-bottom: 36px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature { min-height: 290px; }
+      .board-demo { min-height: 360px; overflow-x: auto; grid-template-columns: repeat(4, minmax(130px, 1fr)); }
+      .final-cta { padding: 88px 0; }
+      .cta-frame { padding: 54px 18px; box-shadow: 9px 9px 0 var(--shadow); }
+      .footer-inner { flex-direction: column; align-items: flex-start; justify-content: center; gap: 5px; }
     }
+
+    @media (max-width: 430px) {
+      .nav-actions .button span:first-child { display: none; }
+      .hero-actions { align-items: stretch; }
+      .hero-actions .button { width: 100%; }
+      .visual-header, .visual-caption { font-size: 7px; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
-<body>
-  <div class="app-shell">
-    <header id="app-header" class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">P</div>
-        <div>
-          <h1>PIPEDO</h1>
-          <p>LOCAL-FIRST TASK PIPELINE</p>
-        </div>
+<body id="top">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="PIPEDO home">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span>PIPEDO</span>
+      </a>
+      <div class="nav-actions">
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false"><span id="theme-glyph" aria-hidden="true">☼</span></button>
+        <a class="button button-primary" href="app.html" aria-label="Open PIPEDO app"><span>OPEN APP</span><span class="button-arrow" aria-hidden="true">→</span></a>
       </div>
-      <div class="header-actions">
-        <div id="sync-status" class="sync-status" data-mode="local" role="status" aria-live="polite" title="Tasks are safely stored in this browser">
-          <span class="sync-dot" aria-hidden="true"></span>
-          <span id="sync-label">LOCAL</span>
-        </div>
-        <button id="setup-button" class="btn icon-btn" type="button" aria-label="Open Supabase setup">SETUP</button>
-        <button id="backup-button" class="btn icon-btn backup-button" type="button" title="No connected backup file">BACKUP <span id="backup-led" class="backup-led" data-state="disconnected" aria-hidden="true"></span><span id="backup-led-text" class="visually-hidden">Backup file disconnected</span></button>
-        <button id="theme-toggle" class="btn icon-btn theme-button" type="button" aria-label="Switch to light theme" aria-pressed="false"><span id="theme-glyph" class="theme-glyph" aria-hidden="true">☼</span><span id="theme-label">LIGHT</span></button>
-      </div>
-    </header>
-
-    <nav class="toolbar" aria-label="Task views and filters">
-      <div class="view-switcher" role="tablist" aria-label="View">
-        <button id="view-todo" class="view-button" type="button" role="tab" aria-controls="todo-view" aria-selected="true">TODO <span class="kbd" aria-hidden="true">1</span></button>
-        <button id="view-board" class="view-button" type="button" role="tab" aria-controls="board-view" aria-selected="false">BOARD <span class="kbd" aria-hidden="true">2</span></button>
-      </div>
-      <label class="search-wrap" for="search-input">
-        <span class="search-icon" aria-hidden="true">⌕</span>
-        <input id="search-input" class="field search-input" type="search" autocomplete="off" placeholder="Filter by title, description, or subitem…" aria-label="Search tasks by title, description, or subitem">
-        <span class="kbd search-key" aria-hidden="true">/</span>
-      </label>
-      <label>
-        <span class="visually-hidden">Filter tasks by status</span>
-        <select id="status-filter" class="field filter-select" aria-label="Filter tasks by status">
-          <option value="all">ALL STATUSES</option>
-          <option value="active">ACTIVE</option>
-          <option value="backlog">BACKLOG</option>
-          <option value="todo">TODO</option>
-          <option value="in_progress">IN PROGRESS</option>
-          <option value="done">DONE</option>
-        </select>
-      </label>
-      <button id="new-task-button" class="btn btn-primary" type="button">NEW TASK <span class="kbd" aria-hidden="true">N</span></button>
     </nav>
+  </header>
 
-    <main id="main-content">
-      <section id="todo-view" class="view" role="tabpanel" aria-labelledby="view-todo">
-        <div class="view-heading">
-          <div>
-            <h2>Task list</h2>
-            <p>Check off work or change its stage directly.</p>
-          </div>
-          <div id="todo-count" class="count" aria-live="polite">0 TASKS</div>
-        </div>
-        <div id="todo-list" class="todo-list" aria-label="Tasks"></div>
-      </section>
-
-      <section id="board-view" class="view" role="tabpanel" aria-labelledby="view-board" hidden>
-        <div class="view-heading">
-          <div>
-            <h2>Pipeline board</h2>
-            <p>Drag by the grip, or use each card’s movement controls.</p>
-          </div>
-          <div id="board-count" class="count" aria-live="polite">0 TASKS</div>
-        </div>
-        <div id="board" class="board" aria-label="Kanban board">
-          <section id="backlog-column" class="board-column" data-status="backlog" aria-labelledby="backlog-heading">
-            <header class="column-header">
-              <h3 id="backlog-heading" class="column-title"><span class="column-accent" aria-hidden="true"></span>Backlog</h3>
-              <span class="column-count" data-count-for="backlog">0</span>
-            </header>
-            <div class="column-cards" data-drop-status="backlog" aria-label="Backlog tasks"></div>
-          </section>
-          <section id="todo-column" class="board-column" data-status="todo" aria-labelledby="todo-heading">
-            <header class="column-header">
-              <h3 id="todo-heading" class="column-title"><span class="column-accent" aria-hidden="true"></span>Todo</h3>
-              <span class="column-count" data-count-for="todo">0</span>
-            </header>
-            <div class="column-cards" data-drop-status="todo" aria-label="Todo tasks"></div>
-          </section>
-          <section id="in-progress-column" class="board-column" data-status="in_progress" aria-labelledby="progress-heading">
-            <header class="column-header">
-              <h3 id="progress-heading" class="column-title"><span class="column-accent" aria-hidden="true"></span>In progress</h3>
-              <span class="column-count" data-count-for="in_progress">0</span>
-            </header>
-            <div class="column-cards" data-drop-status="in_progress" aria-label="In progress tasks"></div>
-          </section>
-          <section id="done-column" class="board-column" data-status="done" aria-labelledby="done-heading">
-            <header class="column-header">
-              <h3 id="done-heading" class="column-title"><span class="column-accent" aria-hidden="true"></span>Done</h3>
-              <span class="column-count" data-count-for="done">0</span>
-            </header>
-            <div class="column-cards" data-drop-status="done" aria-label="Done tasks"></div>
-          </section>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <div class="shortcuts" aria-label="Keyboard shortcuts">
-        <span class="shortcut"><span class="kbd">N</span> new</span>
-        <span class="shortcut"><span class="kbd">/</span> search</span>
-        <span class="shortcut"><span class="kbd">1</span>/<span class="kbd">2</span> views</span>
-        <span class="shortcut"><span class="kbd">⇧1–4</span> move focused task</span>
-        <span class="shortcut"><span class="kbd">Esc</span> close</span>
-      </div>
-      <span>YOUR DATA IS SAVED LOCALLY BEFORE EVERY SYNC</span>
-    </footer>
-  </div>
-
-  <dialog id="task-modal" aria-labelledby="task-modal-title">
-    <form id="task-form">
-      <header class="modal-header">
-        <h2 id="task-modal-title">New task</h2>
-        <button id="modal-close" class="btn icon-btn modal-close" type="button" aria-label="Close task editor">×</button>
-      </header>
-      <div class="modal-body">
-        <div class="form-group">
-          <label for="task-title">Title</label>
-          <input id="task-title" class="field" name="title" type="text" maxlength="200" required autocomplete="off" placeholder="What needs doing?">
-        </div>
-        <div class="form-group">
-          <label for="task-description">Description</label>
-          <textarea id="task-description" class="field" name="description" maxlength="4000" placeholder="Optional notes, context, or next action"></textarea>
-        </div>
-        <div class="form-group">
-          <label>Subitems</label>
-          <div id="subitem-editor" class="subitem-editor" aria-label="Task subitems"></div>
-          <button id="subitem-add" class="btn subitem-add" type="button">ADD SUBITEM</button>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="task-status">Status</label>
-            <select id="task-status" class="field" name="status">
-              <option value="backlog">Backlog</option>
-              <option value="todo">Todo</option>
-              <option value="in_progress">In progress</option>
-              <option value="done">Done</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="task-color">Color</label>
-            <select id="task-color" class="field" name="color">
-              <option value="neutral">Neutral</option>
-              <option value="blue">Tokyo blue</option>
-              <option value="cyan">Tokyo cyan</option>
-              <option value="violet">Tokyo violet</option>
-              <option value="pink">Tokyo pink</option>
-              <option value="green">Tokyo green</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="task-due-date">Due date</label>
-          <input id="task-due-date" class="field" name="due_date" type="date">
+  <main id="main-content" tabindex="-1">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-content">
+        <p class="eyebrow">Local-first task pipeline</p>
+        <h1 id="hero-title">Turn noise into <span class="hero-highlight">forward motion.</span></h1>
+        <p class="hero-copy">A focused Todo and Kanban workspace that keeps work visible, decisions simple, and your data close.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="app.html">START ORGANIZING <span class="button-arrow" aria-hidden="true">→</span></a>
+          <a class="button button-secondary" href="#system">SEE HOW IT WORKS</a>
+          <p class="free-note">Free forever · no payment · no credit card</p>
         </div>
       </div>
-      <footer class="modal-actions">
-        <span class="delete-slot"><button id="modal-delete" class="btn btn-danger" type="button" hidden>DELETE</button></span>
-        <button id="modal-cancel" class="btn" type="button">CANCEL</button>
-        <button id="modal-save" class="btn btn-primary" type="submit">SAVE TASK</button>
-      </footer>
-    </form>
-  </dialog>
 
-  <dialog id="setup-modal" aria-labelledby="setup-title">
-    <header class="modal-header">
-      <h2 id="setup-title">Optional Supabase setup</h2>
-      <button id="setup-close" class="btn icon-btn modal-close" type="button" aria-label="Close Supabase setup">×</button>
-    </header>
-    <div class="modal-body">
-      <p class="setup-copy">The app is fully functional without Supabase. To sync, run this SQL in a Supabase project, then place the project URL and anon key in <code>config.js</code>.</p>
-      <p class="warning"><strong>DEMO SECURITY WARNING:</strong> These permissive RLS policies let anyone with the public anon key read, create, edit, and delete every task. Use them only for a personal demo or trusted environment. Add authentication and user-scoped policies before exposing real or sensitive data.</p>
-      <pre id="setup-sql" tabindex="0" aria-label="Supabase setup SQL">create table if not exists public.tasks (
-  id text primary key,
-  title text not null,
-  description text not null default '',
-  status text not null check (status in ('backlog', 'todo', 'in_progress', 'done')),
-  color text not null default 'neutral',
-  due_date date,
-  subitems jsonb not null default '[]'::jsonb,
-  position bigint not null default 0,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  constraint pipedo_tasks_color_check check (color in ('neutral', 'blue', 'cyan', 'violet', 'pink', 'green'))
-);
+      <div class="hero-visual" aria-hidden="true">
+        <span class="float-tag one">STATE <strong>LOCAL</strong></span>
+        <span class="float-tag two">FLOW <strong>VISIBLE</strong></span>
+        <div class="visual-frame">
+          <div class="visual-header"><span>PIPELINE / ACTIVE</span><span class="visual-status"><span class="status-dot"></span>DATA SAFE</span></div>
+          <svg class="pipeline-svg" viewBox="0 0 620 390" role="presentation">
+            <defs>
+              <linearGradient id="trace" x1="0" x2="1">
+                <stop offset="0" stop-color="var(--accent)" stop-opacity=".18"/>
+                <stop offset=".5" stop-color="var(--accent)"/>
+                <stop offset="1" stop-color="var(--cyan)" stop-opacity=".3"/>
+              </linearGradient>
+            </defs>
+            <rect width="620" height="390" fill="var(--panel)"/>
+            <g stroke="var(--line)" stroke-width="1">
+              <path d="M0 65H620M0 130H620M0 195H620M0 260H620M0 325H620"/>
+              <path d="M103 0V390M206 0V390M309 0V390M412 0V390M515 0V390"/>
+            </g>
+            <g fill="none" stroke="url(#trace)" stroke-width="2">
+              <path class="signal-line" d="M52 283C120 283 114 104 206 104S290 246 365 246 429 118 566 118"/>
+              <path class="signal-line" d="M52 173C145 173 127 330 252 330S385 187 566 187" opacity=".48"/>
+            </g>
+            <g fill="var(--panel)" stroke="var(--accent)" stroke-width="2">
+              <rect class="signal-node" x="43" y="274" width="18" height="18"/>
+              <rect class="signal-node" x="197" y="95" width="18" height="18"/>
+              <rect class="signal-node" x="356" y="237" width="18" height="18"/>
+              <rect class="signal-node" x="557" y="109" width="18" height="18"/>
+            </g>
+            <g class="moving-card">
+              <rect x="74" y="79" width="144" height="72" fill="var(--chrome)" stroke="var(--line-strong)"/>
+              <rect x="74" y="79" width="3" height="72" fill="var(--cyan)"/>
+              <path d="M91 98H185M91 112H162" stroke="var(--title)" stroke-width="4" opacity=".8"/>
+              <path d="M91 132H137" stroke="var(--muted)" stroke-width="3"/>
+            </g>
+            <g class="moving-card">
+              <rect x="337" y="271" width="166" height="78" fill="var(--chrome)" stroke="var(--line-strong)"/>
+              <rect x="337" y="271" width="3" height="78" fill="var(--pink)"/>
+              <path d="M355 290H465M355 304H439" stroke="var(--title)" stroke-width="4" opacity=".8"/>
+              <rect x="355" y="321" width="9" height="9" fill="var(--green)"/>
+              <path d="M370 325H414" stroke="var(--muted)" stroke-width="3"/>
+            </g>
+            <g fill="var(--muted)" font-size="9" letter-spacing="1.4">
+              <text x="23" y="29">BACKLOG</text><text x="178" y="29">TODO</text><text x="323" y="29">IN PROGRESS</text><text x="525" y="29">DONE</text>
+            </g>
+            <rect class="scan-line" x="0" y="61" width="620" height="1" fill="var(--accent)" opacity="0"/>
+          </svg>
+          <div class="visual-caption"><span>ONE SYSTEM / FOUR STAGES</span><strong>ZERO CLUTTER</strong></div>
+        </div>
+      </div>
+    </section>
 
-alter table public.tasks add column if not exists color text;
-alter table public.tasks add column if not exists due_date date;
-alter table public.tasks add column if not exists subitems jsonb not null default '[]'::jsonb;
-update public.tasks
-  set color = 'neutral'
-  where color is null or color not in ('neutral', 'blue', 'cyan', 'violet', 'pink', 'green');
-alter table public.tasks alter column color set default 'neutral';
-alter table public.tasks alter column color set not null;
+    <section class="proof-bar" aria-label="Product principles">
+      <div class="proof-grid shell">
+        <div class="proof-item"><span class="proof-index">01</span><div><strong>Local by default</strong><span>Useful before a server ever responds.</span></div></div>
+        <div class="proof-item"><span class="proof-index">02</span><div><strong>One clear flow</strong><span>Todo speed with Kanban visibility.</span></div></div>
+        <div class="proof-item"><span class="proof-index">03</span><div><strong>Portable data</strong><span>Back up and restore with plain JSON.</span></div></div>
+      </div>
+    </section>
 
-do $$
-begin
-  if not exists (
-    select 1
-    from pg_constraint
-    where conrelid = 'public.tasks'::regclass
-      and conname = 'pipedo_tasks_color_check'
-  ) then
-    alter table public.tasks
-      add constraint pipedo_tasks_color_check
-      check (color in ('neutral', 'blue', 'cyan', 'violet', 'pink', 'green'));
-  end if;
-end
-$$;
+    <section id="system" class="section shell" aria-labelledby="benefits-title">
+      <div class="section-heading reveal">
+        <div><p class="section-kicker">Designed for momentum</p><h2 id="benefits-title">Less managing.<br>More moving.</h2></div>
+        <p class="section-intro">PIPEDO removes the ceremony around task management. Capture work, see its state, and move it forward without navigating a maze of settings.</p>
+      </div>
+      <div class="feature-grid reveal">
+        <article class="feature">
+          <span class="feature-accent"></span><span class="feature-number">01 / FOCUS</span>
+          <div class="feature-graphic" aria-hidden="true">
+            <svg viewBox="0 0 260 110">
+              <g fill="none" stroke="currentColor">
+                <rect x="84" y="9" width="92" height="92" opacity=".25"/>
+                <rect class="orbit" x="104" y="29" width="52" height="52" stroke="var(--cyan)"/>
+                <path d="M23 55H84M176 55H237" stroke-dasharray="4 6" opacity=".6"/>
+                <circle cx="130" cy="55" r="7" fill="var(--accent)"/>
+              </g>
+            </svg>
+          </div>
+          <h3>Signal over noise</h3>
+          <p>A restrained interface keeps the next action obvious and the rest out of your way.</p>
+        </article>
+        <article class="feature">
+          <span class="feature-accent"></span><span class="feature-number">02 / CONTROL</span>
+          <div class="feature-graphic" aria-hidden="true">
+            <svg viewBox="0 0 260 110">
+              <g fill="none" stroke="var(--line-strong)"><rect x="52" y="16" width="156" height="78"/><path d="M52 39H208"/></g>
+              <rect x="69" y="52" width="15" height="15" fill="none" stroke="var(--green)"/>
+              <path class="check-path" d="M73 59L78 64L87 53" fill="none" stroke="var(--green)" stroke-width="2"/>
+              <path d="M96 56H176M96 68H151" stroke="var(--title)" stroke-width="3" opacity=".65"/>
+            </svg>
+          </div>
+          <h3>Tasks with depth</h3>
+          <p>Use descriptions, colors, due dates, and subitems without turning one task into a project plan.</p>
+        </article>
+        <article class="feature">
+          <span class="feature-accent"></span><span class="feature-number">03 / OWNERSHIP</span>
+          <div class="feature-graphic" aria-hidden="true">
+            <svg viewBox="0 0 260 110">
+              <g fill="none" stroke="var(--line-strong)"><rect x="69" y="19" width="96" height="67"/><path d="M84 37H149M84 49H137M84 61H144"/></g>
+              <g class="backup-arrow" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M188 73V32M178 42L188 32L198 42"/><path d="M173 78H203"/></g>
+            </svg>
+          </div>
+          <h3>Your work stays yours</h3>
+          <p>Local storage comes first, with portable backups and optional cloud synchronization when you want it.</p>
+        </article>
+      </div>
+    </section>
 
-alter table public.tasks enable row level security;
+    <section class="flow-section">
+      <div class="section flow-layout shell">
+        <div class="flow-copy reveal">
+          <p class="section-kicker">One source of truth</p>
+          <h2>See the whole system.</h2>
+          <p>Switch between a fast checklist and a four-stage board. Both views operate on the same tasks, so nothing disappears between planning and execution.</p>
+          <ul class="flow-list">
+            <li>Capture in seconds <span>READY</span></li>
+            <li>Reorder by drag <span>FLUID</span></li>
+            <li>Break work into subitems <span>CLEAR</span></li>
+            <li>Search everything instantly <span>FAST</span></li>
+          </ul>
+        </div>
+        <div class="board-demo reveal" aria-label="Example PIPEDO board">
+          <div class="demo-column"><div class="demo-column-head">Backlog</div><div class="demo-card cyan">Research sync flow<small>OCT 29</small></div></div>
+          <div class="demo-column"><div class="demo-column-head">Todo</div><div class="demo-card">Refine landing copy<div class="demo-check">Benefits clear</div></div><div class="demo-card pink">Prepare release<small>2 SUBITEMS</small></div></div>
+          <div class="demo-column"><div class="demo-column-head">In progress</div><div class="demo-card">Build account UI<div class="demo-check">Auth states</div><small>TODAY</small></div></div>
+          <div class="demo-column"><div class="demo-column-head">Done</div><div class="demo-card green">Design system<small>COMPLETE</small></div></div>
+        </div>
+      </div>
+    </section>
 
-grant usage on schema public to anon;
-grant select, insert, update, delete on public.tasks to anon;
+    <section class="final-cta shell">
+      <div class="cta-frame reveal">
+        <p class="section-kicker">Start where you are</p>
+        <h2>A calmer system is one click away.</h2>
+        <p>Open PIPEDO and start organizing immediately. Your first task stays in your browser, not behind a signup wall.</p>
+        <a class="button button-primary" href="app.html">OPEN PIPEDO <span class="button-arrow" aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  </main>
 
-drop policy if exists "pipedo_demo_select" on public.tasks;
-drop policy if exists "pipedo_demo_insert" on public.tasks;
-drop policy if exists "pipedo_demo_update" on public.tasks;
-drop policy if exists "pipedo_demo_delete" on public.tasks;
-
-create policy "pipedo_demo_select" on public.tasks
-  for select to anon using (true);
-create policy "pipedo_demo_insert" on public.tasks
-  for insert to anon with check (true);
-create policy "pipedo_demo_update" on public.tasks
-  for update to anon using (true) with check (true);
-create policy "pipedo_demo_delete" on public.tasks
-  for delete to anon using (true);</pre>
+  <footer class="site-footer">
+    <div class="footer-inner shell">
+      <span>© <span id="year"></span> PIPEDO / LOCAL-FIRST TASK PIPELINE</span>
+      <span class="footer-signal">FREE / NO CREDIT CARD</span>
     </div>
-    <footer class="modal-actions">
-      <button id="copy-sql" class="btn" type="button">COPY SQL</button>
-      <button id="setup-done" class="btn btn-primary" type="button">DONE</button>
-    </footer>
-  </dialog>
-
-  <dialog id="backup-modal" aria-labelledby="backup-title" aria-describedby="backup-description backup-status">
-    <header class="modal-header">
-      <h2 id="backup-title">Backup &amp; restore</h2>
-      <button id="backup-close" class="btn icon-btn modal-close" type="button" aria-label="Close backup and restore">×</button>
-    </header>
-    <div class="modal-body">
-      <div id="backup-state" class="backup-state" data-level="warning">
-        <div class="backup-state-row">
-          <span class="backup-state-label">Backup mode</span>
-          <strong id="backup-mode" class="backup-mode">CHECKING SUPPORT</strong>
-        </div>
-        <p id="backup-status" class="backup-status-copy" role="status" aria-live="polite">Checking whether automatic file backup is available.</p>
-      </div>
-      <p id="backup-description" class="backup-copy">Open one backup file for both restore and automatic saving. Existing files are read before any write. New empty files receive the current tasks. Changes save immediately and every minute while access remains authorized.</p>
-      <label class="backup-choice" for="backup-restore-mode">
-        <span>When a backup contains tasks</span>
-        <select id="backup-restore-mode" class="field">
-          <option value="merge">MERGE — KEEP CURRENT TASKS</option>
-          <option value="replace">REPLACE — USE ONLY BACKUP TASKS</option>
-        </select>
-      </label>
-      <div class="backup-actions is-three" aria-label="Connected file backup">
-        <button id="backup-connect" class="btn btn-primary" type="button">OPEN &amp; CONNECT</button>
-        <button id="backup-create" class="btn" type="button">CREATE NEW</button>
-        <button id="backup-save-now" class="btn" type="button" disabled>SAVE NOW</button>
-      </div>
-      <section class="backup-group" aria-labelledby="manual-backup-title">
-        <h3 id="manual-backup-title" class="backup-group-title">Manual files — available in every browser</h3>
-        <p class="backup-copy">Export a portable JSON backup, or import one using the merge or replace choice above. Merge is the safe default: current tasks always win conflicts.</p>
-        <div class="backup-actions">
-          <button id="backup-export" class="btn" type="button">EXPORT JSON</button>
-          <button id="backup-import" class="btn" type="button">IMPORT FILE</button>
-        </div>
-        <input id="backup-file-input" class="visually-hidden" type="file" accept=".json,application/json" tabindex="-1" aria-label="Choose a PIPEDO JSON backup to import">
-      </section>
-    </div>
-    <footer class="modal-actions">
-      <button id="backup-done" class="btn btn-primary" type="button">CLOSE</button>
-    </footer>
-  </dialog>
-
-  <div id="announcer" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+  </footer>
 
   <script>
     (() => {
-      'use strict';
+      const root = document.documentElement;
+      const toggle = document.querySelector('#theme-toggle');
+      const glyph = document.querySelector('#theme-glyph');
 
-      const LOCAL_KEY = 'pipedo.tasks.v1';
-      const PREFS_KEY = 'pipedo.preferences.v1';
-      const STATUSES = ['backlog', 'todo', 'in_progress', 'done'];
-      const STATUS_LABELS = { backlog: 'Backlog', todo: 'Todo', in_progress: 'In progress', done: 'Done' };
-      const TASK_COLORS = Object.freeze({
-        neutral: '#565a70',
-        blue: '#7aa2f7',
-        cyan: '#7dcfff',
-        violet: '#bb9af7',
-        pink: '#f7768e',
-        green: '#9ece6a'
-      });
-      const CLOUD_TIMEOUT_MS = 5000;
+      function updateThemeButton() {
+        const isLight = root.dataset.theme === 'light';
+        toggle.setAttribute('aria-pressed', String(isLight));
+        toggle.setAttribute('aria-label', `Switch to ${isLight ? 'dark' : 'light'} theme`);
+        glyph.textContent = isLight ? '☾' : '☼';
+      }
 
-      const $ = (selector, root = document) => root.querySelector(selector);
-      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-
-      function readPrefs() {
+      toggle.addEventListener('click', () => {
+        const theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+        root.dataset.theme = theme;
+        root.style.colorScheme = theme;
         try {
-          const value = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}');
-          return {
-            view: value.view === 'board' ? 'board' : 'todo',
-            filter: ['all', 'active', ...STATUSES].includes(value.filter) ? value.filter : 'all',
-            theme: value.theme === 'light' ? 'light' : 'dark'
-          };
-        } catch (_) {
-          return { view: 'todo', filter: 'all', theme: 'dark' };
-        }
-      }
-
-      function validDate(value, fallback) {
-        const date = new Date(value);
-        return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
-      }
-
-      function normalizeTaskColor(value) {
-        return Object.prototype.hasOwnProperty.call(TASK_COLORS, value) ? value : 'neutral';
-      }
-
-      function dueDateParts(value) {
-        if (typeof value !== 'string') return null;
-        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-        if (!match) return null;
-        const year = Number(match[1]);
-        const month = Number(match[2]);
-        const day = Number(match[3]);
-        if (year < 1 || month < 1 || month > 12) return null;
-        const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
-        const monthDays = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        return day >= 1 && day <= monthDays[month - 1] ? { year, month, day } : null;
-      }
-
-      function normalizeDueDate(value) {
-        if (value === null || value === undefined || value === '') return '';
-        return dueDateParts(value) ? value : '';
-      }
-
-      function normalizeSubitems(value) {
-        if (!Array.isArray(value)) return [];
-        const ids = new Set();
-        return value.slice(0, 100).flatMap((raw) => {
-          if (!raw || typeof raw !== 'object') return [];
-          const title = String(raw.title || '').trim().slice(0, 200);
-          if (!title) return [];
-          let id = typeof raw.id === 'string' && raw.id.trim() ? raw.id.trim().slice(0, 200) : createId();
-          while (ids.has(id)) id = createId();
-          ids.add(id);
-          return [{ id, title, completed: raw.completed === true }];
-        });
-      }
-
-      function normalizeTask(raw) {
-        if (!raw || typeof raw !== 'object' || typeof raw.id !== 'string' || !raw.id) return null;
-        const now = new Date().toISOString();
-        const created = validDate(raw.created_at, now);
-        const numericPosition = Number(raw.position);
-        return {
-          id: raw.id,
-          title: String(raw.title || '').trim().slice(0, 200) || 'Untitled task',
-          description: String(raw.description || '').slice(0, 4000),
-          status: STATUSES.includes(raw.status) ? raw.status : 'todo',
-          color: normalizeTaskColor(raw.color),
-          due_date: normalizeDueDate(raw.due_date),
-          subitems: normalizeSubitems(raw.subitems),
-          position: Number.isFinite(numericPosition) ? Math.trunc(numericPosition) : Date.now(),
-          created_at: created,
-          updated_at: validDate(raw.updated_at, created)
-        };
-      }
-
-      function readLocalData() {
-        try {
-          const parsed = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
-          const rawTasks = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.tasks) ? parsed.tasks : []);
-          const tasks = rawTasks.map(normalizeTask).filter(Boolean);
-          const tombstones = parsed && !Array.isArray(parsed) && parsed.tombstones && typeof parsed.tombstones === 'object'
-            ? Object.fromEntries(Object.entries(parsed.tombstones).filter(([id, date]) => id && !Number.isNaN(new Date(date).getTime())))
-            : {};
-          const pendingReconciliation = !Array.isArray(parsed) && typeof parsed?.pending_reconciliation === 'string'
-            ? parsed.pending_reconciliation
-            : null;
-          return { tasks, tombstones, pendingReconciliation };
-        } catch (_) {
-          return { tasks: [], tombstones: {}, pendingReconciliation: null };
-        }
-      }
-
-      const prefs = readPrefs();
-      const stored = readLocalData();
-      const state = {
-        tasks: stored.tasks,
-        tombstones: stored.tombstones,
-        pendingReconciliation: stored.pendingReconciliation,
-        view: prefs.view,
-        query: '',
-        filter: prefs.filter,
-        theme: prefs.theme,
-        editingId: null,
-        sync: { mode: 'local', label: navigator.onLine ? 'LOCAL' : 'OFFLINE · LOCAL', detail: 'Tasks are safely stored in this browser' },
-        drag: null
-      };
-
-      function persistLocal() {
-        localStorage.setItem(LOCAL_KEY, JSON.stringify({
-          tasks: state.tasks,
-          tombstones: state.tombstones,
-          pending_reconciliation: state.pendingReconciliation
-        }));
-      }
-
-      function persistPrefs() {
-        localStorage.setItem(PREFS_KEY, JSON.stringify({ view: state.view, filter: state.filter, theme: state.theme }));
-      }
-
-      function applyTheme(theme, options = {}) {
-        const nextTheme = theme === 'light' ? 'light' : 'dark';
-        state.theme = nextTheme;
-        document.documentElement.dataset.theme = nextTheme;
-        document.documentElement.style.colorScheme = nextTheme;
-        const isLight = nextTheme === 'light';
-        const button = $('#theme-toggle');
-        button.setAttribute('aria-pressed', String(isLight));
-        button.setAttribute('aria-label', `Switch to ${isLight ? 'dark' : 'light'} theme`);
-        button.title = `Switch to ${isLight ? 'dark' : 'light'} theme`;
-        $('#theme-glyph').textContent = isLight ? '☾' : '☼';
-        $('#theme-label').textContent = isLight ? 'DARK' : 'LIGHT';
-        if (options.persist !== false) persistPrefs();
-        if (options.announce !== false) announce(`${isLight ? 'Light' : 'Dark'} theme enabled`);
-      }
-
-      function createId() {
-        if (window.crypto?.randomUUID) return window.crypto.randomUUID();
-        return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
-      }
-
-      function compareTasks(a, b) {
-        const statusDifference = STATUSES.indexOf(a.status) - STATUSES.indexOf(b.status);
-        if (statusDifference) return statusDifference;
-        return a.position - b.position || a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id);
-      }
-
-      function nextPosition(status) {
-        const values = state.tasks.filter((task) => task.status === status).map((task) => task.position);
-        return (values.length ? Math.max(...values) : 0) + 1024;
-      }
-
-      function announce(message) {
-        const node = $('#announcer');
-        node.textContent = '';
-        window.setTimeout(() => { node.textContent = message; }, 20);
-      }
-
-      function setSync(mode, label, detail) {
-        state.sync = { mode, label, detail };
-        const status = $('#sync-status');
-        status.dataset.mode = mode;
-        status.title = detail;
-        $('#sync-label').textContent = label;
-      }
-
-      function filteredTasks() {
-        const query = state.query.trim().toLocaleLowerCase();
-        return state.tasks.filter((task) => {
-          const searchable = `${task.title}\n${task.description}\n${task.subitems.map((item) => item.title).join('\n')}`;
-          const matchesQuery = !query || searchable.toLocaleLowerCase().includes(query);
-          const matchesFilter = state.filter === 'all'
-            || (state.filter === 'active' && task.status !== 'done')
-            || task.status === state.filter;
-          return matchesQuery && matchesFilter;
-        }).sort(compareTasks);
-      }
-
-      function makeButton(text, className, label, action, id) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = className;
-        button.textContent = text;
-        button.setAttribute('aria-label', label);
-        button.dataset.action = action;
-        if (id) button.dataset.taskId = id;
-        return button;
-      }
-      function localDateFromParts(parts) {
-        const date = new Date();
-        date.setHours(12, 0, 0, 0);
-        date.setFullYear(parts.year, parts.month - 1, parts.day);
-        return date;
-      }
-
-      function formatDueDate(parts, options) {
-        return new Intl.DateTimeFormat(undefined, options).format(localDateFromParts(parts));
-      }
-
-      function duePresentation(task) {
-        const parts = dueDateParts(task.due_date);
-        if (!parts) return null;
-        const today = new Date();
-        const dueKey = parts.year * 10000 + parts.month * 100 + parts.day;
-        const todayKey = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-        const shortDate = formatDueDate(parts, { year: 'numeric', month: 'short', day: 'numeric' }).toUpperCase();
-        const spokenDate = formatDueDate(parts, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        if (task.status === 'done') {
-          return { text: `DUE ${shortDate} · COMPLETE`, className: 'is-complete', aria: `Due ${spokenDate}; completed, not overdue` };
-        }
-        if (dueKey < todayKey) {
-          return { text: `OVERDUE · ${shortDate}`, className: 'is-overdue', aria: `Overdue; due ${spokenDate}` };
-        }
-        if (dueKey === todayKey) {
-          return { text: 'DUE TODAY', className: 'is-today', aria: `Due today, ${spokenDate}` };
-        }
-        return { text: `DUE · ${shortDate}`, className: 'is-future', aria: `Due ${spokenDate}` };
-      }
-
-      function createDueBadge(presentation) {
-        const badge = document.createElement('span');
-        badge.className = `due-badge ${presentation.className}`;
-        badge.textContent = presentation.text;
-        badge.setAttribute('aria-label', presentation.aria);
-        return badge;
-      }
-
-      function createSubitemList(task, className = '') {
-        if (!task.subitems.length) return null;
-        const list = document.createElement('ul');
-        list.className = `subitem-list ${className}`.trim();
-        task.subitems.forEach((item) => {
-          const row = document.createElement('li');
-          row.className = `subitem${item.completed ? ' is-complete' : ''}`;
-          const toggle = makeButton('✓', 'subitem-toggle', `${item.completed ? 'Reopen' : 'Complete'} subitem ${item.title}`, 'toggle-subitem', task.id);
-          toggle.dataset.subitemId = item.id;
-          toggle.setAttribute('role', 'checkbox');
-          toggle.setAttribute('aria-checked', String(item.completed));
-          const title = document.createElement('span');
-          title.className = 'subitem-title';
-          title.textContent = item.title;
-          row.append(toggle, title);
-          list.append(row);
-        });
-        return list;
-      }
-
-      function taskAriaLabel(task, due) {
-        return `${task.title}, ${STATUS_LABELS[task.status]}. ${due ? due.aria : 'No due date'}. Shift plus 1 through 4 changes status.`;
-      }
-
-      function renderTodo(tasks) {
-        const list = $('#todo-list');
-        list.replaceChildren();
-        $('#todo-count').textContent = `${tasks.length} ${tasks.length === 1 ? 'TASK' : 'TASKS'}`;
-
-        if (!tasks.length) {
-          const empty = document.createElement('div');
-          empty.className = 'empty-state';
-          const message = state.tasks.length ? 'No matching tasks' : 'Your pipeline is clear';
-          empty.innerHTML = `<div><strong>${message}</strong><span>${state.tasks.length ? 'Try a different search or status filter.' : 'Press N or choose NEW TASK to add your first task.'}</span></div>`;
-          list.append(empty);
-          return;
-        }
-
-        tasks.forEach((task) => {
-          const due = duePresentation(task);
-          const row = document.createElement('article');
-          row.className = `todo-row${task.status === 'done' ? ' is-done' : ''}`;
-          row.dataset.taskId = task.id;
-          row.style.setProperty('--task-color', TASK_COLORS[task.color]);
-          row.tabIndex = 0;
-          row.setAttribute('aria-label', taskAriaLabel(task, due));
-          const check = makeButton('✓', 'check-button', task.status === 'done' ? `Mark ${task.title} as todo` : `Mark ${task.title} complete`, 'toggle', task.id);
-          check.setAttribute('role', 'checkbox');
-          check.setAttribute('aria-checked', String(task.status === 'done'));
-
-          const copy = document.createElement('div');
-          copy.className = 'task-copy';
-          const title = document.createElement('div');
-          title.className = 'task-title';
-          title.textContent = task.title;
-          copy.append(title);
-          if (task.description) {
-            const description = document.createElement('div');
-            description.className = 'task-description';
-            description.textContent = task.description;
-            copy.append(description);
-          }
-          const subitems = createSubitemList(task, 'todo-subitems');
-          if (subitems) copy.append(subitems);
-          if (due) copy.append(createDueBadge(due));
-
-          const select = document.createElement('select');
-          select.className = 'status-select';
-          select.dataset.action = 'status';
-          select.dataset.taskId = task.id;
-          select.setAttribute('aria-label', `Move ${task.title} to status`);
-          STATUSES.forEach((status) => {
-            const option = document.createElement('option');
-            option.value = status;
-            option.textContent = STATUS_LABELS[status];
-            option.selected = task.status === status;
-            select.append(option);
-          });
-
-          const actions = document.createElement('div');
-          actions.className = 'row-actions';
-          actions.append(makeButton('EDIT', 'move-button', `Edit ${task.title}`, 'edit', task.id));
-          row.append(check, copy, select, actions);
-          list.append(row);
-        });
-      }
-
-      function formatDate(value) {
-        try {
-          return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(value)).toUpperCase();
-        } catch (_) {
-          return '';
-        }
-      }
-
-      function createCard(task) {
-        const due = duePresentation(task);
-        const card = document.createElement('article');
-        card.className = 'task-card';
-        card.dataset.taskId = task.id;
-        card.style.setProperty('--task-color', TASK_COLORS[task.color]);
-        card.tabIndex = 0;
-        card.setAttribute('aria-label', taskAriaLabel(task, due));
-        const top = document.createElement('div');
-        top.className = 'card-top';
-        const grip = makeButton('⠿', 'drag-handle', `Drag ${task.title} to reorder or change status`, 'drag', task.id);
-        grip.dataset.dragHandle = 'true';
-        const title = document.createElement('h4');
-        title.className = 'card-title';
-        title.textContent = task.title;
-        const edit = makeButton('···', 'move-button', `Edit ${task.title}`, 'edit', task.id);
-        top.append(grip, title, edit);
-        card.append(top);
-
-        if (task.description) {
-          const description = document.createElement('p');
-          description.className = 'card-description';
-          description.textContent = task.description;
-          card.append(description);
-        }
-        const subitems = createSubitemList(task);
-        if (subitems) card.append(subitems);
-        if (due) card.append(createDueBadge(due));
-
-        const meta = document.createElement('div');
-        meta.className = 'card-meta';
-        const date = document.createElement('span');
-        date.className = 'card-date';
-        date.textContent = formatDate(task.updated_at);
-        const controls = document.createElement('div');
-        controls.className = 'move-controls';
-        const statusIndex = STATUSES.indexOf(task.status);
-        const previous = makeButton('←', 'move-button', `Move ${task.title} to ${STATUS_LABELS[STATUSES[statusIndex - 1]] || 'previous stage'}`, 'previous', task.id);
-        previous.disabled = statusIndex === 0;
-        const next = makeButton('→', 'move-button', `Move ${task.title} to ${STATUS_LABELS[STATUSES[statusIndex + 1]] || 'next stage'}`, 'next', task.id);
-        next.disabled = statusIndex === STATUSES.length - 1;
-        controls.append(previous, next);
-        meta.append(date, controls);
-        card.append(meta);
-        return card;
-      }
-
-      function renderBoard(tasks) {
-        $('#board-count').textContent = `${tasks.length} ${tasks.length === 1 ? 'TASK' : 'TASKS'}`;
-        STATUSES.forEach((status) => {
-          const container = $(`[data-drop-status="${status}"]`);
-          const statusTasks = tasks.filter((task) => task.status === status);
-          container.replaceChildren(...statusTasks.map(createCard));
-          $(`[data-count-for="${status}"]`).textContent = statusTasks.length;
-          if (!statusTasks.length) {
-            const empty = document.createElement('div');
-            empty.className = 'column-empty';
-            empty.textContent = state.tasks.length ? 'NO MATCHING TASKS' : 'DROP TASKS HERE';
-            container.append(empty);
-          }
-        });
-      }
-
-      let dueRefreshTimer = null;
-      let renderedDueDateKey = '';
-
-      function localDateKey(date = new Date()) {
-        return date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
-      }
-
-      function scheduleDueRefresh() {
-        if (dueRefreshTimer !== null) window.clearTimeout(dueRefreshTimer);
-        const now = new Date();
-        const nextMidnight = new Date(now);
-        nextMidnight.setHours(24, 0, 0, 0);
-        dueRefreshTimer = window.setTimeout(() => {
-          render();
-          scheduleDueRefresh();
-        }, Math.max(1000, nextMidnight.getTime() - now.getTime() + 250));
-      }
-
-      function refreshDueDateIfNeeded() {
-        if (localDateKey() !== renderedDueDateKey) render();
-        scheduleDueRefresh();
-      }
-
-      function render() {
-        renderedDueDateKey = localDateKey();
-        const tasks = filteredTasks();
-        const todoActive = state.view === 'todo';
-        $('#todo-view').hidden = !todoActive;
-        $('#board-view').hidden = todoActive;
-        $('#view-todo').setAttribute('aria-selected', String(todoActive));
-        $('#view-board').setAttribute('aria-selected', String(!todoActive));
-        $('#status-filter').value = state.filter;
-        if ($('#search-input').value !== state.query) $('#search-input').value = state.query;
-        renderTodo(tasks);
-        renderBoard(tasks);
-      }
-
-      function setView(view, focusTab = false) {
-        state.view = view === 'board' ? 'board' : 'todo';
-        persistPrefs();
-        render();
-        if (focusTab) $(`#view-${state.view}`).focus();
-      }
-
-      function withTimeout(promise, milliseconds = CLOUD_TIMEOUT_MS) {
-        let timer;
-        return Promise.race([
-          Promise.resolve(promise),
-          new Promise((_, reject) => { timer = window.setTimeout(() => reject(new Error('Cloud request timed out')), milliseconds); })
-        ]).finally(() => window.clearTimeout(timer));
-      }
-
-      function cloudRow(task) {
-        return {
-          id: task.id,
-          title: task.title,
-          description: task.description,
-          status: task.status,
-          color: task.color,
-          due_date: task.due_date || null,
-          subitems: task.subitems,
-          position: task.position,
-          created_at: task.created_at,
-          updated_at: task.updated_at
-        };
-      }
-
-      const Repository = (() => {
-        let client = null;
-        let cloudReady = false;
-        let operationQueue = Promise.resolve();
-        let connecting = false;
-
-        function hasConfig() {
-          const config = window.PIPEDO_CONFIG;
-          if (!config || typeof config !== 'object') return false;
-          try {
-            const url = new URL(String(config.supabaseUrl || ''));
-            return /^https?:$/.test(url.protocol) && String(config.supabaseAnonKey || '').trim().length > 20;
-          } catch (_) {
-            return false;
-          }
-        }
-
-        function tableName() {
-          const name = String(window.PIPEDO_CONFIG?.tableName || 'tasks');
-          return /^[A-Za-z_][A-Za-z0-9_]*$/.test(name) ? name : 'tasks';
-        }
-
-        function localOnly(label = (navigator.onLine ? 'LOCAL' : 'OFFLINE · LOCAL')) {
-          cloudReady = false;
-          setSync('local', label, 'Tasks are safely stored in this browser');
-        }
-
-        function cloudFailure(error) {
-          cloudReady = false;
-          const message = error instanceof Error ? error.message : String(error || 'Cloud sync failed');
-          setSync('error', 'SYNC ERROR · LOCAL SAFE', `${message}. Changes remain stored in this browser.`);
-        }
-
-        async function checked(query) {
-          const result = await withTimeout(query);
-          if (result?.error) throw result.error;
-          return result;
-        }
-
-        function queueCloud(operation) {
-          if (!cloudReady || !client || !navigator.onLine) {
-            if (!navigator.onLine) localOnly();
-            return;
-          }
-          operationQueue = operationQueue.catch(() => {}).then(async () => {
-            if (!cloudReady || !navigator.onLine) return;
-            setSync('syncing', 'SYNCING', 'Saving local changes to Supabase');
-            try {
-              await operation();
-              if (cloudReady) setSync('cloud', 'CLOUD SYNCED', 'Local tasks and Supabase are synchronized');
-            } catch (error) {
-              cloudFailure(error);
-            }
-          });
-        }
-
-        function saveTask(task) {
-          const index = state.tasks.findIndex((item) => item.id === task.id);
-          if (index >= 0) state.tasks.splice(index, 1, task);
-          else state.tasks.push(task);
-          delete state.tombstones[task.id];
-          persistLocal();
-          BackupManager.dataChanged();
-          render();
-          queueCloud(() => checked(client.from(tableName()).upsert(cloudRow(task), { onConflict: 'id' })));
-        }
-
-        function create(fields) {
-          const now = new Date().toISOString();
-          const status = STATUSES.includes(fields.status) ? fields.status : 'todo';
-          const task = {
-            id: createId(),
-            title: fields.title,
-            description: fields.description,
-            status,
-            color: normalizeTaskColor(fields.color),
-            due_date: normalizeDueDate(fields.due_date),
-            subitems: normalizeSubitems(fields.subitems),
-            position: nextPosition(status),
-            created_at: now,
-            updated_at: now
-          };
-          saveTask(task);
-          announce(`Created ${task.title}`);
-          return task;
-        }
-
-        function update(id, changes) {
-          const current = state.tasks.find((task) => task.id === id);
-          if (!current) return null;
-          const status = STATUSES.includes(changes.status) ? changes.status : current.status;
-          const color = Object.prototype.hasOwnProperty.call(changes, 'color')
-            ? normalizeTaskColor(changes.color)
-            : current.color;
-          const dueDate = Object.prototype.hasOwnProperty.call(changes, 'due_date')
-            ? normalizeDueDate(changes.due_date)
-            : current.due_date;
-          const subitems = Object.prototype.hasOwnProperty.call(changes, 'subitems')
-            ? normalizeSubitems(changes.subitems)
-            : current.subitems;
-          const task = {
-            ...current,
-            ...changes,
-            status,
-            color,
-            due_date: dueDate,
-            subitems,
-            position: status === current.status ? current.position : nextPosition(status),
-            updated_at: new Date().toISOString()
-          };
-          saveTask(task);
-          announce(`Updated ${task.title}`);
-          return task;
-        }
-
-        function reorder(id, status, beforeId = null) {
-          if (!STATUSES.includes(status)) return null;
-          const current = state.tasks.find((task) => task.id === id);
-          if (!current) return null;
-          const ordered = state.tasks
-            .filter((task) => task.status === status && task.id !== id)
-            .sort(compareTasks);
-          const beforeIndex = beforeId ? ordered.findIndex((task) => task.id === beforeId) : -1;
-          ordered.splice(beforeIndex >= 0 ? beforeIndex : ordered.length, 0, { ...current, status });
-          const now = new Date().toISOString();
-          const replacements = new Map();
-          ordered.forEach((task, index) => {
-            const position = (index + 1) * 1024;
-            if (task.status !== status || task.position !== position) {
-              replacements.set(task.id, { ...task, status, position, updated_at: now });
-            }
-          });
-          if (!replacements.size) return current;
-          state.tasks = state.tasks.map((task) => replacements.get(task.id) || task);
-          persistLocal();
-          BackupManager.dataChanged();
-          render();
-          const changed = Array.from(replacements.values());
-          queueCloud(() => checked(client.from(tableName()).upsert(changed.map(cloudRow), { onConflict: 'id' })));
-          announce(`${current.status === status ? 'Reordered' : 'Moved'} ${current.title} in ${STATUS_LABELS[status]}`);
-          return replacements.get(id) || current;
-        }
-
-        function remove(id) {
-          const task = state.tasks.find((item) => item.id === id);
-          if (!task) return;
-          const deletedAt = new Date().toISOString();
-          state.tasks = state.tasks.filter((item) => item.id !== id);
-          state.tombstones[id] = deletedAt;
-          persistLocal();
-          BackupManager.dataChanged();
-          render();
-          announce(`Deleted ${task.title}`);
-          queueCloud(async () => {
-            await checked(client.from(tableName()).delete().eq('id', id));
-            if (state.tombstones[id] === deletedAt) {
-              delete state.tombstones[id];
-              persistLocal();
-              BackupManager.dataChanged();
-            }
-          });
-        }
-
-        async function flushAll() {
-          const snapshot = state.tasks.map(cloudRow);
-          if (snapshot.length) await checked(client.from(tableName()).upsert(snapshot, { onConflict: 'id' }));
-          const deletions = Object.entries(state.tombstones);
-          let tombstonesChanged = false;
-          for (const [id, deletedAt] of deletions) {
-            await checked(client.from(tableName()).delete().eq('id', id));
-            if (state.tombstones[id] === deletedAt) {
-              delete state.tombstones[id];
-              tombstonesChanged = true;
-            }
-          }
-          persistLocal();
-          if (tombstonesChanged) BackupManager.dataChanged();
-        }
-
-        async function reconcileReplacement() {
-          const reconciliationId = state.pendingReconciliation;
-          if (!reconciliationId) {
-            await flushAll();
-            return;
-          }
-
-          const snapshot = state.tasks.map(cloudRow);
-          const restoredIds = new Set(snapshot.map((task) => task.id));
-          const deletions = Object.entries(state.tombstones);
-          const response = await checked(client.from(tableName()).select('id'));
-          if (snapshot.length) await checked(client.from(tableName()).upsert(snapshot, { onConflict: 'id' }));
-          for (const row of (Array.isArray(response.data) ? response.data : [])) {
-            if (typeof row?.id === 'string' && !restoredIds.has(row.id)) {
-              await checked(client.from(tableName()).delete().eq('id', row.id));
-            }
-          }
-          for (const [id] of deletions) {
-            await checked(client.from(tableName()).delete().eq('id', id));
-          }
-
-          if (state.pendingReconciliation !== reconciliationId) return;
-          let tombstonesChanged = false;
-          for (const [id, deletedAt] of deletions) {
-            if (state.tombstones[id] === deletedAt) {
-              delete state.tombstones[id];
-              tombstonesChanged = true;
-            }
-          }
-          state.pendingReconciliation = null;
-          persistLocal();
-          if (tombstonesChanged) BackupManager.dataChanged();
-        }
-
-        function replaceAll(tasks, tombstones) {
-          const deletedAt = new Date().toISOString();
-          const reconciliationId = `restore-${createId()}`;
-          const restoredTasks = tasks.map((task) => ({ ...task }));
-          const restoredIds = new Set(restoredTasks.map((task) => task.id));
-          const restoredTombstones = { ...tombstones };
-          state.tasks.forEach((task) => {
-            if (!restoredIds.has(task.id)) restoredTombstones[task.id] = deletedAt;
-          });
-          restoredIds.forEach((id) => { delete restoredTombstones[id]; });
-
-          localStorage.setItem(LOCAL_KEY, JSON.stringify({
-            tasks: restoredTasks,
-            tombstones: restoredTombstones,
-            pending_reconciliation: reconciliationId
-          }));
-          state.tasks = restoredTasks;
-          state.tombstones = restoredTombstones;
-          state.pendingReconciliation = reconciliationId;
-          BackupManager.dataChanged();
-          render();
-          queueCloud(() => reconcileReplacement());
-        }
-
-        async function connect() {
-          if (connecting) return;
-          if (!hasConfig()) {
-            localOnly();
-            return;
-          }
-          if (!navigator.onLine) {
-            localOnly();
-            return;
-          }
-          connecting = true;
-          cloudReady = false;
-          setSync('syncing', 'CONNECTING', 'Connecting to Supabase');
-          try {
-            const library = await withTimeout(window.__pipedoSupabaseReady, 4000);
-            if (!library?.createClient) throw new Error('Supabase library unavailable');
-            client = library.createClient(window.PIPEDO_CONFIG.supabaseUrl, window.PIPEDO_CONFIG.supabaseAnonKey, {
-              auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-            });
-            const response = await checked(client.from(tableName()).select('*'));
-            if (!state.pendingReconciliation) {
-              const remoteTasks = (Array.isArray(response.data) ? response.data : []).map(normalizeTask).filter(Boolean);
-              const merged = new Map(state.tasks.map((task) => [task.id, task]));
-
-              remoteTasks.forEach((remote) => {
-                const deletedAt = state.tombstones[remote.id];
-                if (deletedAt && deletedAt >= remote.updated_at) {
-                  merged.delete(remote.id);
-                  return;
-                }
-                if (deletedAt) delete state.tombstones[remote.id];
-                const local = merged.get(remote.id);
-                if (!local || remote.updated_at > local.updated_at) merged.set(remote.id, remote);
-              });
-
-              state.tasks = Array.from(merged.values());
-              persistLocal();
-              BackupManager.dataChanged();
-              render();
-            }
-            cloudReady = true;
-            const startupSync = operationQueue.catch(() => {}).then(() => (
-              state.pendingReconciliation ? reconcileReplacement() : flushAll()
-            ));
-            operationQueue = startupSync;
-            await startupSync;
-            if (operationQueue === startupSync && cloudReady) {
-              setSync('cloud', 'CLOUD SYNCED', 'Local tasks and Supabase are synchronized');
-            }
-          } catch (error) {
-            cloudFailure(error);
-            operationQueue = Promise.resolve();
-          } finally {
-            connecting = false;
-          }
-        }
-
-        function reconcilePending() {
-          if (!state.pendingReconciliation) return;
-          if (cloudReady) queueCloud(() => reconcileReplacement());
-          else connect();
-        }
-
-        function goOffline() {
-          cloudReady = false;
-          localOnly('OFFLINE · LOCAL');
-        }
-
-        return { create, update, reorder, remove, replaceAll, reconcilePending, connect, goOffline };
-      })();
-
-      const BackupManager = (() => {
-        const APP_NAME = 'pipedo';
-        const FORMAT_VERSION = 3;
-        const DATABASE_NAME = 'pipedo.backup.v1';
-        const STORE_NAME = 'handles';
-        const HANDLE_KEY = 'backup-file';
-        const INTERVAL_MS = 60000;
-        const openSupported = window.isSecureContext && typeof window.showOpenFilePicker === 'function';
-        const createSupported = window.isSecureContext && typeof window.showSaveFilePicker === 'function';
-        const automaticSupported = openSupported || createSupported;
-        let handle = null;
-        let intervalId = null;
-        let remembered = true;
-        let writeQueue = Promise.resolve();
-        let dataRevision = 0;
-        let savedRevision = -1;
-        let latestWriteRequest = 0;
-
-        function timeLabel(date = new Date()) {
-          return new Intl.DateTimeFormat(undefined, {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-          }).format(date);
-        }
-
-        function errorMessage(error) {
-          return error instanceof Error ? error.message : String(error || 'Unknown error');
-        }
-
-        function setBackupStatus(mode, message, level = 'normal') {
-          $('#backup-mode').textContent = mode;
-          $('#backup-status').textContent = message;
-          $('#backup-state').dataset.level = level;
-        }
-        function setBackupIndicator(status, message) {
-          $('#backup-led').dataset.state = status;
-          $('#backup-led-text').textContent = message;
-          $('#backup-button').title = message;
-        }
-
-        function setBackupError(message) {
-          setBackupIndicator('error', message);
-        }
-
-        function updateControls() {
-          $('#backup-connect').disabled = !openSupported;
-          $('#backup-connect').textContent = handle ? 'OPEN ANOTHER' : 'OPEN & CONNECT';
-          $('#backup-create').disabled = !createSupported;
-          $('#backup-save-now').disabled = !handle;
-        }
-
-        function normalizedSnapshot() {
-          const tasks = state.tasks.map((task) => {
-            const normalized = normalizeTask(task);
-            if (!normalized) throw new Error('Current task data cannot be serialized safely');
-            return { ...normalized, due_date: normalized.due_date || null };
-          });
-          const tombstones = Object.fromEntries(Object.entries(state.tombstones).map(([id, value]) => {
-            const date = new Date(value);
-            if (!id || Number.isNaN(date.getTime())) throw new Error('Current deletion data cannot be serialized safely');
-            return [id, date.toISOString()];
-          }));
-          return {
-            app: APP_NAME,
-            version: FORMAT_VERSION,
-            exported_at: new Date().toISOString(),
-            tasks,
-            tombstones
-          };
-        }
-
-        function serializedSnapshot() {
-          return JSON.stringify(normalizedSnapshot(), null, 2);
-        }
-
-        function openDatabase() {
-          if (!('indexedDB' in window)) return Promise.reject(new Error('IndexedDB is unavailable'));
-          return new Promise((resolve, reject) => {
-            let request;
-            try {
-              request = window.indexedDB.open(DATABASE_NAME, 1);
-            } catch (error) {
-              reject(error);
-              return;
-            }
-            request.onupgradeneeded = () => {
-              if (!request.result.objectStoreNames.contains(STORE_NAME)) request.result.createObjectStore(STORE_NAME);
-            };
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error || new Error('Could not open backup handle storage'));
-            request.onblocked = () => reject(new Error('Backup handle storage is blocked'));
-          });
-        }
-
-        async function handleStore(mode, value) {
-          const database = await openDatabase();
-          try {
-            return await new Promise((resolve, reject) => {
-              const transaction = database.transaction(STORE_NAME, mode);
-              const store = transaction.objectStore(STORE_NAME);
-              const request = mode === 'readonly' ? store.get(HANDLE_KEY) : store.put(value, HANDLE_KEY);
-              request.onsuccess = () => resolve(request.result);
-              request.onerror = () => reject(request.error || new Error('Could not access the saved backup handle'));
-              transaction.onabort = () => reject(transaction.error || new Error('Backup handle storage was aborted'));
-            });
-          } finally {
-            database.close();
-          }
-        }
-
-        async function rememberHandle(fileHandle) {
-          try {
-            await handleStore('readwrite', fileHandle);
-            return true;
-          } catch (_) {
-            return false;
-          }
-        }
-
-        function stopAutomatic() {
-          if (intervalId !== null) {
-            window.clearInterval(intervalId);
-            intervalId = null;
-          }
-        }
-
-        function startAutomatic() {
-          stopAutomatic();
-          intervalId = window.setInterval(() => {
-            enqueueWrite(dataRevision);
-          }, INTERVAL_MS);
-        }
-
-        async function permissionForWrite(fileHandle, allowRequest) {
-          if (!fileHandle) return 'denied';
-          if (typeof fileHandle.queryPermission !== 'function') return allowRequest ? 'granted' : 'prompt';
-          let permission = await fileHandle.queryPermission({ mode: 'readwrite' });
-          if (permission !== 'granted' && allowRequest && typeof fileHandle.requestPermission === 'function') {
-            permission = await fileHandle.requestPermission({ mode: 'readwrite' });
-          }
-          return permission;
-        }
-
-        async function writeConnectedFile(fileHandle, revision, contents, requestId) {
-          if (!fileHandle || fileHandle !== handle) return false;
-          const permission = await permissionForWrite(fileHandle, false);
-          if (permission !== 'granted') {
-            if (fileHandle === handle && requestId === latestWriteRequest) {
-              stopAutomatic();
-              setBackupStatus(
-                'AUTHORIZATION NEEDED',
-                `File permission is ${permission} as of ${timeLabel()}. Choose SAVE NOW to authorize this file, or OPEN ANOTHER to choose a different backup.`,
-                'warning'
-              );
-              setBackupError(`Backup file permission is ${permission}; latest task data is not saved to the connected file`);
-            }
-            return false;
-          }
-
-          let writable = null;
-          try {
-            writable = await fileHandle.createWritable();
-            await writable.write(contents);
-            await writable.close();
-            writable = null;
-            if (fileHandle !== handle) return false;
-            savedRevision = revision;
-            const persistenceNote = remembered ? '' : ' Use OPEN & CONNECT again after reload because this browser could not remember the file.';
-            if (requestId === latestWriteRequest && savedRevision === dataRevision) {
-              setBackupIndicator('current', `Connected backup file is current as of ${timeLabel()}`);
-              setBackupStatus('AUTOMATIC · CONNECTED', `Last saved at ${timeLabel()}.${persistenceNote}`);
-            } else if (requestId === latestWriteRequest) {
-              setBackupIndicator('pending', 'Connected backup file is being updated with newer task data');
-              setBackupStatus('AUTOMATIC · SAVING', `An older revision was saved at ${timeLabel()}; newer changes remain queued.${persistenceNote}`, 'warning');
-            }
-            return true;
-          } catch (error) {
-            if (writable && typeof writable.abort === 'function') {
-              try { await writable.abort(); } catch (_) {}
-            }
-            if (fileHandle === handle && requestId === latestWriteRequest) {
-              setBackupStatus('BACKUP ERROR', `Error at ${timeLabel()}: ${errorMessage(error)}. Task data was not changed.`, 'error');
-              setBackupError(`Connected backup write failed: ${errorMessage(error)}`);
-            }
-            return false;
-          }
-        }
-
-        function enqueueWrite(revision = dataRevision) {
-          const fileHandle = handle;
-          const requestId = ++latestWriteRequest;
-          if (!fileHandle) {
-            setBackupIndicator('disconnected', 'No writable backup file is connected; latest task data is stored only in the browser');
-            return Promise.resolve(false);
-          }
-          let contents;
-          try {
-            contents = serializedSnapshot();
-          } catch (error) {
-            setBackupStatus('BACKUP ERROR', `Error at ${timeLabel()}: ${errorMessage(error)}. Task data was not changed.`, 'error');
-            setBackupError(`Connected backup could not be prepared: ${errorMessage(error)}`);
-            return Promise.resolve(false);
-          }
-          setBackupIndicator('pending', 'Connected backup file has pending task changes');
-          writeQueue = writeQueue.catch(() => false).then(() => writeConnectedFile(fileHandle, revision, contents, requestId)).catch((error) => {
-            if (fileHandle === handle && requestId === latestWriteRequest) {
-              setBackupStatus('BACKUP ERROR', `Error at ${timeLabel()}: ${errorMessage(error)}. Task data was not changed.`, 'error');
-              setBackupError(`Connected backup write failed: ${errorMessage(error)}`);
-            }
-            return false;
-          });
-          return writeQueue;
-        }
-
-        function dataChanged() {
-          dataRevision += 1;
-          if (!handle) {
-            setBackupIndicator('disconnected', 'No writable backup file is connected; latest task data is stored only in the browser');
-            return;
-          }
-          enqueueWrite(dataRevision);
-        }
-
-        async function saveNow() {
-          const fileHandle = handle;
-          if (!fileHandle) return;
-          try {
-            const permission = await permissionForWrite(fileHandle, true);
-            if (fileHandle !== handle) return;
-            if (permission !== 'granted') {
-              stopAutomatic();
-              setBackupStatus('AUTHORIZATION NEEDED', `File permission is ${permission} as of ${timeLabel()}. Choose OPEN ANOTHER to select a different backup.`, 'warning');
-              setBackupError(`Backup file permission is ${permission}; latest task data is not saved to the connected file`);
-              return;
-            }
-            startAutomatic();
-            await enqueueWrite(dataRevision);
-          } catch (error) {
-            if (fileHandle === handle) {
-              setBackupStatus('BACKUP ERROR', `Error at ${timeLabel()}: ${errorMessage(error)}. Task data was not changed.`, 'error');
-              setBackupError(`Connected backup write failed: ${errorMessage(error)}`);
-            }
-          }
-        }
-
-        async function connectSelectedFile(selected) {
-          const file = await selected.getFile();
-          const imported = file.size ? parseImport(await file.text()) : null;
-          const plan = imported ? prepareRestore(imported, file.name) : null;
-          if (imported && !plan) return;
-
-          const permission = await permissionForWrite(selected, true);
-          if (permission !== 'granted') {
-            setBackupStatus('CONNECTION CANCELLED', `Write permission for “${file.name}” is ${permission}. No task data or file contents were changed.`, 'warning');
-            return;
-          }
-
-          stopAutomatic();
-          handle = selected;
-          savedRevision = -1;
-          setBackupIndicator('pending', 'Preparing the selected backup without discarding current tasks');
-          updateControls();
-          const remembering = rememberHandle(selected);
-          startAutomatic();
-          if (plan) {
-            commitRestore(plan, file.name);
-            await writeQueue;
-          } else {
-            await enqueueWrite(dataRevision);
-          }
-          remembered = await remembering;
-        }
-
-        async function connectFile() {
-          if (!openSupported) return;
-          try {
-            const [selected] = await window.showOpenFilePicker({
-              multiple: false,
-              types: [{
-                description: 'PIPEDO JSON backup',
-                accept: { 'application/json': ['.json'] }
-              }]
-            });
-            if (selected) await connectSelectedFile(selected);
-          } catch (error) {
-            if (error?.name === 'AbortError') {
-              if (!handle) setBackupIndicator('disconnected', 'No writable backup file is connected; latest task data is stored only in the browser');
-              setBackupStatus('FILE SELECTION CANCELLED', `No task data or file contents were changed at ${timeLabel()}.`, 'warning');
-              return;
-            }
-            setBackupStatus('CONNECTION REJECTED', `${errorMessage(error)}. No task data or file contents were changed.`, 'error');
-            announce('Backup connection rejected');
-          }
-        }
-
-        async function createFile() {
-          if (!createSupported) return;
-          try {
-            const selected = await window.showSaveFilePicker({
-              suggestedName: 'pipedo-backup-new.json',
-              types: [{
-                description: 'PIPEDO JSON backup',
-                accept: { 'application/json': ['.json'] }
-              }]
-            });
-            const file = await selected.getFile();
-            if (file.size) {
-              setBackupStatus('CREATE CANCELLED', `“${file.name}” already contains data and was not modified. Use OPEN & CONNECT to read it safely.`, 'warning');
-              announce('Existing file was not modified');
-              return;
-            }
-            await connectSelectedFile(selected);
-          } catch (error) {
-            if (error?.name === 'AbortError') {
-              setBackupStatus('FILE CREATION CANCELLED', `No task data or file contents were changed at ${timeLabel()}.`, 'warning');
-              return;
-            }
-            setBackupStatus('CREATE ERROR', `${errorMessage(error)}. No task data or file contents were changed.`, 'error');
-          }
-        }
-
-        function exportJson() {
-          let url = null;
-          try {
-            const now = new Date();
-            const stamp = now.toISOString().replace(/[:.]/g, '-');
-            const blob = new Blob([serializedSnapshot()], { type: 'application/json' });
-            url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `pipedo-backup-${stamp}.json`;
-            document.body.append(link);
-            link.click();
-            link.remove();
-            setBackupStatus('MANUAL EXPORT', `JSON exported at ${timeLabel(now)}.`);
-            announce('PIPEDO JSON backup exported');
-          } catch (error) {
-            setBackupStatus('EXPORT ERROR', `Error at ${timeLabel()}: ${errorMessage(error)}.`, 'error');
-          } finally {
-            if (url) window.setTimeout(() => URL.revokeObjectURL(url), 0);
-          }
-        }
-
-        function assertExactObjectKeys(value, expected, label) {
-          const keys = Object.keys(value);
-          if (keys.length !== expected.length || expected.some((key) => !Object.prototype.hasOwnProperty.call(value, key))) {
-            throw new Error(`${label} does not match the expected backup schema`);
-          }
-        }
-
-        function parseBackupTask(raw, index, ids, color, dueDate, subitems = []) {
-          const number = index + 1;
-          if (typeof raw.id !== 'string' || !raw.id.trim() || raw.id !== raw.id.trim()) {
-            throw new Error(`Task ${number} has an invalid id`);
-          }
-          const id = raw.id;
-          if (ids.has(id)) throw new Error(`Task ${number} duplicates id “${id}”`);
-          ids.add(id);
-          if (typeof raw.title !== 'string' || !raw.title.trim() || raw.title.trim().length > 200) {
-            throw new Error(`Task ${number} has an invalid title`);
-          }
-          if (typeof raw.description !== 'string' || raw.description.length > 4000) {
-            throw new Error(`Task ${number} has an invalid description`);
-          }
-          if (!STATUSES.includes(raw.status)) throw new Error(`Task ${number} has an invalid status`);
-          if (!Number.isSafeInteger(raw.position)) throw new Error(`Task ${number} has an invalid position`);
-          if (typeof raw.created_at !== 'string' || Number.isNaN(new Date(raw.created_at).getTime())) {
-            throw new Error(`Task ${number} has an invalid creation time`);
-          }
-          if (typeof raw.updated_at !== 'string' || Number.isNaN(new Date(raw.updated_at).getTime())) {
-            throw new Error(`Task ${number} has an invalid update time`);
-          }
-          return {
-            id,
-            title: raw.title.trim(),
-            description: raw.description,
-            status: raw.status,
-            color,
-            due_date: dueDate,
-            subitems,
-            position: raw.position,
-            created_at: new Date(raw.created_at).toISOString(),
-            updated_at: new Date(raw.updated_at).toISOString()
-          };
-        }
-
-        function parseVersion1Tasks(rawTasks, ids) {
-          const expected = ['id', 'title', 'description', 'status', 'position', 'created_at', 'updated_at'];
-          return rawTasks.map((raw, index) => {
-            const number = index + 1;
-            if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error(`Task ${number} must be an object`);
-            assertExactObjectKeys(raw, expected, `Version 1 task ${number}`);
-            return parseBackupTask(raw, index, ids, 'neutral', '');
-          });
-        }
-
-        function parseVersion2Tasks(rawTasks, ids) {
-          const expected = ['id', 'title', 'description', 'status', 'color', 'due_date', 'position', 'created_at', 'updated_at'];
-          return rawTasks.map((raw, index) => {
-            const number = index + 1;
-            if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error(`Task ${number} must be an object`);
-            assertExactObjectKeys(raw, expected, `Version 2 task ${number}`);
-            if (!Object.prototype.hasOwnProperty.call(TASK_COLORS, raw.color)) {
-              throw new Error(`Task ${number} has an invalid color`);
-            }
-            if (raw.due_date !== null && (typeof raw.due_date !== 'string' || !dueDateParts(raw.due_date))) {
-              throw new Error(`Task ${number} has an invalid due date`);
-            }
-            return parseBackupTask(raw, index, ids, raw.color, raw.due_date || '');
-          });
-        }
-
-        function parseVersion3Tasks(rawTasks, ids) {
-          const expected = ['id', 'title', 'description', 'status', 'color', 'due_date', 'subitems', 'position', 'created_at', 'updated_at'];
-          return rawTasks.map((raw, index) => {
-            const number = index + 1;
-            if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error(`Task ${number} must be an object`);
-            assertExactObjectKeys(raw, expected, `Version 3 task ${number}`);
-            if (!Object.prototype.hasOwnProperty.call(TASK_COLORS, raw.color)) {
-              throw new Error(`Task ${number} has an invalid color`);
-            }
-            if (raw.due_date !== null && (typeof raw.due_date !== 'string' || !dueDateParts(raw.due_date))) {
-              throw new Error(`Task ${number} has an invalid due date`);
-            }
-            if (!Array.isArray(raw.subitems) || raw.subitems.length > 100) {
-              throw new Error(`Task ${number} has invalid subitems`);
-            }
-            const subitemIds = new Set();
-            const subitems = raw.subitems.map((item, subitemIndex) => {
-              if (!item || typeof item !== 'object' || Array.isArray(item)) {
-                throw new Error(`Task ${number} subitem ${subitemIndex + 1} must be an object`);
-              }
-              assertExactObjectKeys(item, ['id', 'title', 'completed'], `Task ${number} subitem ${subitemIndex + 1}`);
-              if (typeof item.id !== 'string' || !item.id.trim() || item.id !== item.id.trim() || item.id.length > 200 || subitemIds.has(item.id)) {
-                throw new Error(`Task ${number} subitem ${subitemIndex + 1} has an invalid id`);
-              }
-              if (typeof item.title !== 'string' || !item.title.trim() || item.title.trim().length > 200) {
-                throw new Error(`Task ${number} subitem ${subitemIndex + 1} has an invalid title`);
-              }
-              if (typeof item.completed !== 'boolean') {
-                throw new Error(`Task ${number} subitem ${subitemIndex + 1} has an invalid completion state`);
-              }
-              subitemIds.add(item.id);
-              return { id: item.id, title: item.title.trim(), completed: item.completed };
-            });
-            return parseBackupTask(raw, index, ids, raw.color, raw.due_date || '', subitems);
-          });
-        }
-
-        function parseImport(text) {
-          let value;
-          try {
-            value = JSON.parse(text);
-          } catch (_) {
-            throw new Error('The selected file is not valid JSON');
-          }
-          if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('The backup root must be an object');
-          assertExactObjectKeys(value, ['app', 'version', 'exported_at', 'tasks', 'tombstones'], 'Backup root');
-          if (value.app !== APP_NAME) throw new Error('This is not a PIPEDO backup');
-          if (![1, 2, FORMAT_VERSION].includes(value.version)) {
-            throw new Error(`Unsupported backup version: ${String(value.version)}`);
-          }
-          if (typeof value.exported_at !== 'string' || Number.isNaN(new Date(value.exported_at).getTime())) {
-            throw new Error('The backup has an invalid export time');
-          }
-          if (!Array.isArray(value.tasks)) throw new Error('The backup tasks value must be an array');
-          if (!value.tombstones || typeof value.tombstones !== 'object' || Array.isArray(value.tombstones)) {
-            throw new Error('The backup tombstones value must be an object');
-          }
-
-          const ids = new Set();
-          let tasks;
-          if (value.version === 1) tasks = parseVersion1Tasks(value.tasks, ids);
-          else if (value.version === 2) tasks = parseVersion2Tasks(value.tasks, ids);
-          else tasks = parseVersion3Tasks(value.tasks, ids);
-          const tombstones = Object.fromEntries(Object.entries(value.tombstones).map(([rawId, rawDate]) => {
-            const id = rawId.trim();
-            if (!id || id !== rawId || typeof rawDate !== 'string') throw new Error('The backup contains an invalid tombstone');
-            if (ids.has(id)) throw new Error(`Task id “${id}” also appears as a tombstone`);
-            const date = new Date(rawDate);
-            if (Number.isNaN(date.getTime())) throw new Error(`Tombstone “${id}” has an invalid timestamp`);
-            return [id, date.toISOString()];
-          }));
-          return { tasks, tombstones };
-        }
-
-        function prepareRestore(backup, fileName) {
-          const mode = $('#backup-restore-mode').value === 'replace' ? 'replace' : 'merge';
-          if (mode === 'replace') {
-            const confirmed = window.confirm(
-              `REPLACE mode will delete all ${state.tasks.length} current task${state.tasks.length === 1 ? '' : 's'} and use only ${backup.tasks.length} task${backup.tasks.length === 1 ? '' : 's'} from “${fileName}”. This also reconciles the replacement to Supabase. Continue?`
-            );
-            if (!confirmed) {
-              setBackupStatus('REPLACE CANCELLED', 'No task data or file contents were changed.', 'warning');
-              return null;
-            }
-            return {
-              mode,
-              tasks: backup.tasks.map((task) => ({ ...task })),
-              tombstones: { ...backup.tombstones },
-              added: backup.tasks.length
-            };
-          }
-
-          const currentIds = new Set(state.tasks.map((task) => task.id));
-          const tasks = state.tasks.map((task) => ({ ...task }));
-          let added = 0;
-          backup.tasks.forEach((task) => {
-            if (currentIds.has(task.id) || state.tombstones[task.id]) return;
-            currentIds.add(task.id);
-            tasks.push({ ...task });
-            added += 1;
-          });
-          return {
-            mode,
-            tasks,
-            tombstones: { ...state.tombstones },
-            added
-          };
-        }
-
-        function commitRestore(plan, fileName) {
-          Repository.replaceAll(plan.tasks, plan.tombstones);
-          if (plan.mode === 'merge') {
-            setBackupStatus(
-              'MERGE COMPLETE',
-              `${plan.added} task${plan.added === 1 ? '' : 's'} added from “${fileName}”. All current tasks were kept; current versions won conflicts.`
-            );
-            announce(`Merged ${plan.added} task${plan.added === 1 ? '' : 's'} from backup`);
-          } else {
-            setBackupStatus(
-              'REPLACE COMPLETE',
-              `${plan.tasks.length} task${plan.tasks.length === 1 ? '' : 's'} restored from “${fileName}”. Cloud reconciliation has been queued.`
-            );
-            announce(`Replaced local tasks with ${plan.tasks.length} backup task${plan.tasks.length === 1 ? '' : 's'}`);
-          }
-        }
-
-        async function importFile(file) {
-          try {
-            const backup = parseImport(await file.text());
-            const plan = prepareRestore(backup, file.name);
-            if (!plan) return;
-            commitRestore(plan, file.name);
-          } catch (error) {
-            setBackupStatus('IMPORT REJECTED', `${errorMessage(error)}. No task data was changed.`, 'error');
-            announce('Backup import rejected');
-          }
-        }
-
-        async function init() {
-          updateControls();
-          setBackupIndicator('disconnected', 'No writable backup file is connected; latest task data is stored only in the browser');
-          if (!automaticSupported) {
-            setBackupStatus(
-              'MANUAL ONLY',
-              'Automatic file connection is unavailable here. Manual EXPORT JSON and IMPORT FILE remain available.',
-              'warning'
-            );
-            return;
-          }
-
-          let recovered = null;
-          try {
-            recovered = await handleStore('readonly');
-          } catch (_) {
-            remembered = false;
-          }
-          if (!recovered || handle) {
-            if (!handle) setBackupStatus('READY TO CONNECT', 'Choose OPEN & CONNECT. Existing backup contents will be read before the file is updated.', 'warning');
-            return;
-          }
-
-          setBackupIndicator('pending', 'Reading the remembered backup before any update');
-          try {
-            const permission = await permissionForWrite(recovered, false);
-            if (handle) return;
-            if (permission === 'granted') {
-              await connectSelectedFile(recovered);
-            } else {
-              setBackupIndicator('disconnected', 'Remembered backup requires authorization before it can be read or updated');
-              setBackupStatus(
-                'AUTHORIZATION NEEDED',
-                `Saved file permission is ${permission}. Choose OPEN & CONNECT to reselect and read it safely before saving.`,
-                'warning'
-              );
-            }
-          } catch (error) {
-            if (!handle) {
-              setBackupIndicator('disconnected', 'Remembered backup could not be read; current browser tasks remain unchanged');
-              setBackupStatus('AUTHORIZATION NEEDED', `Saved file access could not be checked: ${errorMessage(error)}. Choose OPEN & CONNECT to reselect it.`, 'warning');
-            }
-          }
-        }
-
-        function open() {
-          showDialog($('#backup-modal'));
-          window.setTimeout(() => $('#backup-close').focus(), 0);
-        }
-
-        function close() {
-          closeDialog($('#backup-modal'));
-        }
-
-        $('#backup-button').addEventListener('click', open);
-        $('#backup-close').addEventListener('click', close);
-        $('#backup-done').addEventListener('click', close);
-        $('#backup-connect').addEventListener('click', connectFile);
-        $('#backup-create').addEventListener('click', createFile);
-        $('#backup-save-now').addEventListener('click', saveNow);
-        $('#backup-export').addEventListener('click', exportJson);
-        $('#backup-import').addEventListener('click', () => {
-          const input = $('#backup-file-input');
-          input.value = '';
-          input.click();
-        });
-        $('#backup-file-input').addEventListener('change', (event) => {
-          const file = event.target.files?.[0];
-          event.target.value = '';
-          if (file) importFile(file);
-        });
-        window.addEventListener('beforeunload', stopAutomatic);
-
-        return { init, close, dataChanged };
-      })();
-
-      function showDialog(dialog) {
-        if (typeof dialog.showModal === 'function') dialog.showModal();
-        else dialog.setAttribute('open', '');
-      }
-
-      function closeDialog(dialog) {
-        if (typeof dialog.close === 'function') dialog.close();
-        else dialog.removeAttribute('open');
-      }
-
-      function openTaskModal(id = null) {
-        state.editingId = id;
-        const task = id ? state.tasks.find((item) => item.id === id) : null;
-        $('#task-modal-title').textContent = task ? 'Edit task' : 'New task';
-        $('#task-title').value = task?.title || '';
-        $('#task-description').value = task?.description || '';
-        $('#task-status').value = task?.status || 'todo';
-        $('#task-color').value = task?.color || 'neutral';
-        $('#task-due-date').value = task?.due_date || '';
-        renderSubitemEditor(task?.subitems || []);
-        $('#modal-delete').hidden = !task;
-        showDialog($('#task-modal'));
-        window.setTimeout(() => $('#task-title').focus(), 0);
-      }
-
-      function appendSubitemEditorRow(item = { id: createId(), title: '', completed: false }) {
-        const row = document.createElement('div');
-        row.className = 'subitem-editor-row';
-        row.dataset.subitemId = item.id;
-        const toggle = makeButton('✓', 'subitem-toggle', item.completed ? 'Mark subitem incomplete' : 'Mark subitem complete', 'edit-toggle-subitem');
-        toggle.setAttribute('role', 'checkbox');
-        toggle.setAttribute('aria-checked', String(item.completed));
-        const input = document.createElement('input');
-        input.className = 'field';
-        input.type = 'text';
-        input.maxLength = 200;
-        input.value = item.title;
-        input.placeholder = 'Subitem title';
-        input.setAttribute('aria-label', 'Subitem title');
-        const remove = makeButton('×', 'btn subitem-remove', 'Remove subitem', 'edit-remove-subitem');
-        row.append(toggle, input, remove);
-        $('#subitem-editor').append(row);
-        if (!item.title) input.focus();
-      }
-
-      function renderSubitemEditor(subitems) {
-        $('#subitem-editor').replaceChildren();
-        subitems.forEach(appendSubitemEditorRow);
-      }
-
-      function editorSubitems() {
-        return $$('.subitem-editor-row', $('#subitem-editor')).flatMap((row) => {
-          const title = $('input', row).value.trim();
-          return title ? [{
-            id: row.dataset.subitemId,
-            title,
-            completed: $('[aria-checked]', row).getAttribute('aria-checked') === 'true'
-          }] : [];
-        });
-      }
-
-      function closeTaskModal() {
-        closeDialog($('#task-modal'));
-        state.editingId = null;
-      }
-
-      function moveTask(id, status) {
-        if (!STATUSES.includes(status)) return;
-        const task = state.tasks.find((item) => item.id === id);
-        if (!task || task.status === status) return;
-        const focusedTask = document.activeElement?.closest?.('[data-task-id]');
-        const restoreFocus = focusedTask?.dataset.taskId === id;
-        Repository.update(id, { status });
-        if (restoreFocus) {
-          window.requestAnimationFrame(() => {
-            const activeView = state.view === 'board' ? $('#board-view') : $('#todo-view');
-            $$('[data-task-id]', activeView).find((node) => node.dataset.taskId === id)?.focus({ preventScroll: true });
-          });
-        }
-        announce(`Moved ${task.title} to ${STATUS_LABELS[status]}`);
-      }
-
-      function handleAction(target) {
-        const actionTarget = target.closest('[data-action]');
-        if (!actionTarget || actionTarget.dataset.action === 'drag') return;
-        const id = actionTarget.dataset.taskId || actionTarget.closest('[data-task-id]')?.dataset.taskId;
-        const task = state.tasks.find((item) => item.id === id);
-        if (!task) return;
-        switch (actionTarget.dataset.action) {
-          case 'edit': openTaskModal(id); break;
-          case 'toggle': moveTask(id, task.status === 'done' ? 'todo' : 'done'); break;
-          case 'previous': moveTask(id, STATUSES[STATUSES.indexOf(task.status) - 1]); break;
-          case 'next': moveTask(id, STATUSES[STATUSES.indexOf(task.status) + 1]); break;
-          case 'toggle-subitem': {
-            const subitemId = actionTarget.dataset.subitemId;
-            Repository.update(id, {
-              subitems: task.subitems.map((item) => item.id === subitemId ? { ...item, completed: !item.completed } : item)
-            });
-            break;
-          }
-        }
-      }
-
-      $('#todo-list').addEventListener('click', (event) => handleAction(event.target));
-      $('#board').addEventListener('click', (event) => handleAction(event.target));
-      $('#todo-list').addEventListener('change', (event) => {
-        const select = event.target.closest('[data-action="status"]');
-        if (select) moveTask(select.dataset.taskId, select.value);
+          const preferences = JSON.parse(localStorage.getItem('pipedo.preferences.v1') || '{}');
+          localStorage.setItem('pipedo.preferences.v1', JSON.stringify({ ...preferences, theme }));
+        } catch (_) {}
+        updateThemeButton();
       });
 
-      function focusTaskFromPointer(event) {
-        if (event.button !== 0 || event.target.closest('button, input, select, textarea, a')) return;
-        event.target.closest('[data-task-id]')?.focus({ preventScroll: true });
-      }
-      $('#todo-list').addEventListener('pointerdown', focusTaskFromPointer);
-      $('#board').addEventListener('pointerdown', focusTaskFromPointer);
-
-      $('#view-todo').addEventListener('click', () => setView('todo'));
-      $('#view-board').addEventListener('click', () => setView('board'));
-      $('#new-task-button').addEventListener('click', () => openTaskModal());
-      $('#search-input').addEventListener('input', (event) => {
-        state.query = event.target.value;
-        render();
-      });
-      $('#status-filter').addEventListener('change', (event) => {
-        state.filter = event.target.value;
-        persistPrefs();
-        render();
-      });
-
-      $('#subitem-add').addEventListener('click', () => {
-        if ($$('.subitem-editor-row', $('#subitem-editor')).length < 100) appendSubitemEditorRow();
-      });
-      $('#subitem-editor').addEventListener('click', (event) => {
-        const action = event.target.closest('[data-action]');
-        const row = action?.closest('.subitem-editor-row');
-        if (!row) return;
-        if (action.dataset.action === 'edit-remove-subitem') {
-          row.remove();
-          return;
-        }
-        if (action.dataset.action === 'edit-toggle-subitem') {
-          const completed = action.getAttribute('aria-checked') !== 'true';
-          action.setAttribute('aria-checked', String(completed));
-          action.setAttribute('aria-label', completed ? 'Mark subitem incomplete' : 'Mark subitem complete');
-        }
-      });
-      $('#task-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        const title = $('#task-title').value.trim();
-        if (!title) {
-          $('#task-title').focus();
-          return;
-        }
-        const fields = {
-          title,
-          description: $('#task-description').value.trim(),
-          status: $('#task-status').value,
-          color: $('#task-color').value,
-          due_date: $('#task-due-date').value,
-          subitems: editorSubitems()
-        };
-        if (state.editingId) Repository.update(state.editingId, fields);
-        else Repository.create(fields);
-        closeTaskModal();
-      });
-      $('#modal-close').addEventListener('click', closeTaskModal);
-      $('#modal-cancel').addEventListener('click', closeTaskModal);
-      $('#modal-delete').addEventListener('click', () => {
-        const task = state.tasks.find((item) => item.id === state.editingId);
-        if (!task || !window.confirm(`Delete “${task.title}”? This cannot be undone.`)) return;
-        Repository.remove(task.id);
-        closeTaskModal();
-      });
-      $('#task-modal').addEventListener('close', () => { state.editingId = null; });
-
-      function openSetup() {
-        showDialog($('#setup-modal'));
-        window.setTimeout(() => $('#setup-close').focus(), 0);
-      }
-      function closeSetup() { closeDialog($('#setup-modal')); }
-      $('#setup-button').addEventListener('click', openSetup);
-      $('#theme-toggle').addEventListener('click', () => {
-        applyTheme(state.theme === 'dark' ? 'light' : 'dark');
-      });
-      $('#setup-close').addEventListener('click', closeSetup);
-      $('#setup-done').addEventListener('click', closeSetup);
-      $('#copy-sql').addEventListener('click', async () => {
-        const text = $('#setup-sql').textContent;
-        try {
-          await navigator.clipboard.writeText(text);
-          $('#copy-sql').textContent = 'COPIED';
-          announce('SQL copied to clipboard');
-          window.setTimeout(() => { $('#copy-sql').textContent = 'COPY SQL'; }, 1500);
-        } catch (_) {
-          const range = document.createRange();
-          range.selectNodeContents($('#setup-sql'));
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(range);
-          announce('SQL selected; copy it with your system shortcut');
-        }
-      });
-
-      function typingTarget(target) {
-        return target instanceof Element && (target.matches('input, textarea, select') || target.closest('[contenteditable="true"]'));
+      const revealNodes = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        }, { threshold: .14 });
+        revealNodes.forEach((node) => observer.observe(node));
+      } else {
+        revealNodes.forEach((node) => node.classList.add('is-visible'));
       }
 
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          if ($('#task-modal').open) closeTaskModal();
-          else if ($('#setup-modal').open) closeSetup();
-          else if ($('#backup-modal').open) BackupManager.close();
-          return;
-        }
-        if (typingTarget(event.target) || $('#task-modal').open || $('#setup-modal').open || $('#backup-modal').open) return;
-
-        const focusedTask = document.activeElement?.closest?.('[data-task-id]');
-        const statusKey = /^Digit([1-4])$/.exec(event.code)?.[1]
-          || (['1', '2', '3', '4'].includes(event.key) ? event.key : null);
-        if (focusedTask && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey && statusKey) {
-          event.preventDefault();
-          moveTask(focusedTask.dataset.taskId, STATUSES[Number(statusKey) - 1]);
-          return;
-        }
-
-        const searchShortcut = event.code === 'Slash' || event.code === 'NumpadDivide' || event.key === '/';
-        if (searchShortcut && !event.ctrlKey && !event.metaKey && !event.altKey) {
-          event.preventDefault();
-          $('#search-input').focus();
-          return;
-        }
-
-        if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
-        if (event.code === 'KeyN' || event.key.toLowerCase() === 'n') {
-          event.preventDefault();
-          openTaskModal();
-        } else if (event.code === 'Digit1' || event.key === '1') {
-          event.preventDefault();
-          setView('todo', true);
-        } else if (event.code === 'Digit2' || event.key === '2') {
-          event.preventDefault();
-          setView('board', true);
-        }
-      });
-
-      let pointerDrag = null;
-      $('#board').addEventListener('pointerdown', (event) => {
-        const handle = event.target.closest('[data-drag-handle]');
-        if (!handle || event.button !== 0) return;
-        const card = handle.closest('.task-card');
-        pointerDrag = {
-          id: card.dataset.taskId,
-          pointerId: event.pointerId,
-          startX: event.clientX,
-          startY: event.clientY,
-          offsetX: event.clientX - card.getBoundingClientRect().left,
-          offsetY: event.clientY - card.getBoundingClientRect().top,
-          card,
-          ghost: null,
-          targetStatus: null,
-          beforeId: null
-        };
-        handle.setPointerCapture?.(event.pointerId);
-      });
-
-      document.addEventListener('pointermove', (event) => {
-        if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
-        const distance = Math.hypot(event.clientX - pointerDrag.startX, event.clientY - pointerDrag.startY);
-        if (!pointerDrag.ghost && distance < 6) return;
-        event.preventDefault();
-        if (!pointerDrag.ghost) {
-          pointerDrag.ghost = pointerDrag.card.cloneNode(true);
-          pointerDrag.ghost.classList.add('drag-ghost');
-          pointerDrag.ghost.removeAttribute('tabindex');
-          document.body.append(pointerDrag.ghost);
-          document.body.classList.add('is-dragging');
-          pointerDrag.card.style.opacity = '.35';
-        }
-        pointerDrag.ghost.style.left = `${event.clientX - pointerDrag.offsetX}px`;
-        pointerDrag.ghost.style.top = `${event.clientY - pointerDrag.offsetY}px`;
-        $$('.board-column.is-drop-target').forEach((column) => column.classList.remove('is-drop-target'));
-        $$('.task-card.is-drop-before').forEach((card) => card.classList.remove('is-drop-before'));
-        $$('.column-cards.is-drop-at-end').forEach((column) => column.classList.remove('is-drop-at-end'));
-        const dropzone = document.elementFromPoint(event.clientX, event.clientY)?.closest('[data-drop-status]');
-        pointerDrag.targetStatus = dropzone?.dataset.dropStatus || null;
-        pointerDrag.beforeId = null;
-        if (dropzone) {
-          const beforeCard = $$('.task-card', dropzone)
-            .filter((card) => card.dataset.taskId !== pointerDrag.id)
-            .find((card) => {
-              const rect = card.getBoundingClientRect();
-              return event.clientY < rect.top + rect.height / 2;
-            });
-          pointerDrag.beforeId = beforeCard?.dataset.taskId || null;
-          if (beforeCard) beforeCard.classList.add('is-drop-before');
-          else dropzone.classList.add('is-drop-at-end');
-          dropzone.closest('.board-column')?.classList.add('is-drop-target');
-        }
-      }, { passive: false });
-
-      function finishPointerDrag(event) {
-        if (!pointerDrag || event.pointerId !== pointerDrag.pointerId) return;
-        const completed = pointerDrag;
-        pointerDrag = null;
-        completed.ghost?.remove();
-        completed.card.style.opacity = '';
-        document.body.classList.remove('is-dragging');
-        $$('.board-column.is-drop-target').forEach((column) => column.classList.remove('is-drop-target'));
-        $$('.task-card.is-drop-before').forEach((card) => card.classList.remove('is-drop-before'));
-        $$('.column-cards.is-drop-at-end').forEach((column) => column.classList.remove('is-drop-at-end'));
-        if (completed.ghost && completed.targetStatus) Repository.reorder(completed.id, completed.targetStatus, completed.beforeId);
-      }
-      document.addEventListener('pointerup', finishPointerDrag);
-      document.addEventListener('pointercancel', finishPointerDrag);
-
-      window.addEventListener('offline', () => Repository.goOffline());
-      window.addEventListener('online', () => Repository.connect());
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) refreshDueDateIfNeeded();
-      });
-      window.addEventListener('focus', refreshDueDateIfNeeded);
-      window.addEventListener('storage', (event) => {
-        if (event.key === PREFS_KEY) {
-          const latestPrefs = readPrefs();
-          if (latestPrefs.theme !== state.theme) applyTheme(latestPrefs.theme, { persist: false, announce: false });
-          return;
-        }
-        if (event.key !== LOCAL_KEY) return;
-        const latest = readLocalData();
-        state.tasks = latest.tasks;
-        state.tombstones = latest.tombstones;
-        state.pendingReconciliation = latest.pendingReconciliation;
-        BackupManager.dataChanged();
-        Repository.reconcilePending();
-        render();
-        announce('Tasks updated from another tab');
-      });
-      applyTheme(state.theme, { persist: false, announce: false });
-
-      persistLocal();
-      render();
-      scheduleDueRefresh();
-      Repository.connect();
-      BackupManager.init();
+      document.querySelector('#year').textContent = new Date().getFullYear();
+      updateThemeButton();
     })();
   </script>
 </body>
